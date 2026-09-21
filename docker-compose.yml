@@ -29,5 +29,5 @@ services:
     volumes:
       - .:/app/
     working_dir: /app/src/app/services/frontend/
-    command: npm run dev
+    command: sh -c "rm -r node_modules && npm i && npm run dev"
 
