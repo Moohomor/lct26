@@ -14,7 +14,7 @@ services:
   pgsql:
     image: postgres:14
     volumes:
-      - ./database:/var/lib/postgresql/data
+      - ./database/data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
