@@ -1,0 +1,33 @@
+# Список наших сервисов (контейнеров)
+services:
+  api:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app/
+    working_dir: /app/src/app/services/backend/
+    links:
+      - pgsql
+    command: fastapi run main.py --port 5000
+
+  pgsql:
+    image: postgres:14
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 123456
+
+  nodejs:
+    image: node:22-alpine
+    ports:
+      - "8080:3000"
+    user: "1000:1000"
+    volumes:
+      - .:/app/
+    working_dir: /app/src/app/services/frontend/
+    command: npm run dev
+
