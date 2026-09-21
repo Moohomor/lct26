@@ -1,6 +1,6 @@
 export const useWebsiteStore = defineStore('websiteStore', {
   state: () => ({
-    data: '',
+    example: '',
   }),
   actions: {
     async home () {
@@ -8,7 +8,7 @@ export const useWebsiteStore = defineStore('websiteStore', {
 
         const res = await $fetchApi('/')
 
-        this.data = res.Hello
+        this.example = res
     },
   },
 })
