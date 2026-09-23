@@ -8,6 +8,15 @@ export default defineNuxtConfig({
     '~/assets/css/footer.css',
   ],
 
+  routeRules: {
+    '/login': { 
+      appLayout: 'auth'
+    },
+    '/register': { 
+      appLayout: 'auth'
+    },
+  },
+
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   ssr: false,
