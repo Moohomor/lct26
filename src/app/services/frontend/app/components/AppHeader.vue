@@ -4,25 +4,29 @@
 
 <template>    
   <div class="lb-headwrap">
-        <div class="lb-pill" style="max-width:1320px"><img alt="Робот"
-                                                                                           fetchpriority="high"
-                                                                                           width="240" height="78"
-                                                                                           decoding="async"
-                                                                                           data-nimg="1"
-                                                                                           style="color:transparent;height:78px;width:auto"
-                                                                                           srcset="~/assets/img/logo-photoroom_002.avif 1x, ~/assets/img/logo-photoroom.avif 2x"
-                                                                                           src="~/assets/img/logo-photoroom.avif">
+        <div class="lb-pill" style="max-width:1320px">
+            <AppLogo/>
             <nav class="hidden lg:flex items-center" style="flex:1;justify-content:center;gap:0">
-                <div style="position:relative"><a class="lb-navlink" style="font-size:13px"
-                                                  href="/catalog">Каталог</a></div>
-                <div style="position:relative"><a class="lb-navlink" style="font-size:13px"
-                                                  href="/services/audit">Аудит</a></div>
-                <div style="position:relative"><a class="lb-navlink" style="font-size:13px"
-                                                  href="/pilot-testing">Пилотирование</a></div>
-                <div style="position:relative"><a class="lb-navlink" style="font-size:13px"
-                                                  href="/financing">Финансирование</a></div>
-                <div style="position:relative"><a class="lb-navlink" style="font-size:13px"
-                                                  href="/cases">Бизнес-кейсы</a></div>
+                <div style="position:relative">
+                    <NuxtLink to="/catalog" activeClass="active" class="lb-navlink" style="font-size:13px">Каталог</NuxtLink>
+                </div>
+
+                <div style="position:relative">
+                    <NuxtLink to="/robot-selection" activeClass="active" class="lb-navlink" style="font-size:13px">Подбор робота</NuxtLink>
+                </div>
+
+                <div style="position:relative">
+                    <NuxtLink to="/pilot-testing" activeClass="active" class="lb-navlink" style="font-size:13px">Пилотирование</NuxtLink>
+                </div>
+
+                <div style="position:relative">
+                    <NuxtLink to="/financing" activeClass="active" class="lb-navlink" style="font-size:13px">Финансирование</NuxtLink>
+                </div>
+
+                <div style="position:relative">
+                    <NuxtLink to="/cases" activeClass="active" class="lb-navlink" style="font-size:13px">Бизнес-кейсы</NuxtLink>
+                </div>
+
                 <form style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 10px 0 12px;margin-left:6px;border-radius:999px;background:rgba(20,32,51,0.04);border:1px solid rgba(210,220,235,0.75);transition:background 0.15s, border-color 0.15s">
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
                          stroke="var(--faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"

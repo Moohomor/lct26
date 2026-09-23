@@ -22,13 +22,13 @@ useHead({
                         Ваш путь к эффективной роботизации бизнеса</h1></div>
                     <div class="" style="opacity: 1; transform: none;"><p
                             style="display:block;margin:26px 0 0;max-width:640px;font-size:18px;line-height:1.55;color:#4c586a">
-                        Аудит, подбор, тестирование и финансирование роботов — всё, что нужно для успешного внедрения
+                        Подбор, тестирование и финансирование роботов — всё, что нужно для успешного внедрения
                         технологий.</p></div>
                     <div class="" style="opacity: 1; transform: none;">
                         <div class="flex flex-wrap gap-4" style="margin-top:34px"><a
                                 class="inline-flex items-center gap-3 font-bold text-white transition-transform hover:-translate-y-0.5"
                                 style="padding:17px 30px;border-radius:14px;background:var(--accent);font-size:15px;box-shadow:0 14px 32px rgba(30,136,255,0.28)"
-                                href="/robotization-audit">Начать аудит
+                                href="/robot-selection">Начать подбор
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
                                  stroke-linejoin="round" class="lucide lucide-arrow-right">
@@ -77,10 +77,9 @@ useHead({
                     <div class="h-full" style="opacity: 1; transform: none;"><a
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/robotization-audit">
+                            href="/robot-selection">
                         <div class="relative z-[2]" style="width:76%"><h2
-                                style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
-                            AI-аудит</h2>
+                                style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">Подбор робота</h2>
                             <p style="display:block;margin:0;font-size:11px;line-height:1.5;color:#596476">
                                 Интеллектуальный анализ вашего объекта</p></div>
                         <img alt="AI-аудит" loading="lazy" width="320" height="240" decoding="async" data-nimg="1"
