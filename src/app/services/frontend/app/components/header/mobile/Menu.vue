@@ -41,7 +41,7 @@ const store = useHeaderMobileMenuStore()
             <path d="M8 11h.01"></path>
             <path d="M8 16h.01"></path>
         </svg>
-        <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Аудит</span></NuxtLink>
+        <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Подбор робота</span></NuxtLink>
 
         <NuxtLink to="/pilot-testing" style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 10px; text-decoration: none; background: transparent; border: 1px solid transparent; margin-bottom: 4px; transition: background 0.15s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -73,10 +73,9 @@ const store = useHeaderMobileMenuStore()
     </nav>
     <div style="padding: 12px 16px; border-top: 1px solid rgba(210, 220, 235, 0.55); flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;">
         <NuxtLink to="/catalog" style="display: flex; align-items: center; justify-content: center; padding: 11px 16px; font-size: 14px; font-weight: 500; color: var(--ink); border: 1px solid rgba(210, 220, 235, 0.85); border-radius: 8px; text-decoration: none; background: rgba(20, 32, 51, 0.04);">Открыть каталог</NuxtLink>
-        <a href="/register?mode=login"
-                          style="display: flex; align-items: center; justify-content: center; padding: 10px 16px; font-size: 13.5px; color: var(--accent); border: 1px solid rgba(30, 136, 255, 0.35); border-radius: 8px; text-decoration: none;">Войти</a><a
-            href="/register"
-            style="display: flex; align-items: center; justify-content: center; padding: 10px 16px; font-size: 13.5px; font-weight: 600; color: rgb(255, 255, 255); background: var(--accent); border-radius: 8px; text-decoration: none;">Зарегистрироваться</a>
+        <NuxtLink to="/login"
+                          style="display: flex; align-items: center; justify-content: center; padding: 10px 16px; font-size: 13.5px; color: var(--accent); border: 1px solid rgba(30, 136, 255, 0.35); border-radius: 8px; text-decoration: none;">Войти</NuxtLink><NuxtLink to="/register"
+            style="display: flex; align-items: center; justify-content: center; padding: 10px 16px; font-size: 13.5px; font-weight: 600; color: rgb(255, 255, 255); background: var(--accent); border-radius: 8px; text-decoration: none;">Зарегистрироваться</NuxtLink>
     </div>
 </div>
 </template>
