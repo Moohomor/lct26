@@ -2,12 +2,18 @@ FROM python:3.14
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/requirements.txt
+# Зависимости кэшируются отдельно от кода
+COPY requirements.txt /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt
 
-RUN pip install --no-cache-dir --upgrade -r /app/requirements.txt \
-    && pip install uv
+# Код бэкенда (в compose-файле он монтировался через volume,
+# на Render volume'ов нет — копируем код прямо в образ)
+COPY src/app/services/backend/ /app/src/app/services/backend/
 
-# CMD ["uv", "run", "fastapi", "dev", "src/app/services/backend/main.py", "--port", "5000"]
+WORKDIR /app/src/app/services/backend
 
-# Если запускаете за прокси, например Nginx или Traefik, добавьте --proxy-headers
-# CMD ["fastapi", "run", "dev", "app/main.py", "--port", "80", "--proxy-headers"]
+# Render присылает порт через переменную окружения PORT,
+# локально (docker compose) упадём на 5000
+EXPOSE 5000
+
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-5000}"]

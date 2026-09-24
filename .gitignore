@@ -14,4 +14,10 @@ wheels/
 .env.*
 !.env.example
 
+# Grafana data и provisioning не храним в git, но Dockerfile нужен
+# для деплоя на Render
 grafana/
+!grafana/
+!grafana/Dockerfile
+grafana/data/
+grafana/provisioning/

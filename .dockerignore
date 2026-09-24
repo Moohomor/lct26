@@ -1,0 +1,27 @@
+# Docker build context — исключаем локальный мусор и большие каталоги,
+# чтобы образ api собирался быстро (в compose они монтировались volume'ами)
+.git
+.serena
+.venv
+__pycache__
+*.pyc
+*.pyo
+
+node_modules
+.nuxt
+.nitro
+.output
+dist
+
+database/data
+grafana/data
+grafana/provisioning
+
+.env
+.env.*
+Makefile
+README.md
+docker-compose.yml
+render.yaml
+Dockerfile
+.dockerignore
