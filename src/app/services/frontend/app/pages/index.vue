@@ -25,19 +25,19 @@ useHead({
                         Подбор, тестирование и финансирование роботов — всё, что нужно для успешного внедрения
                         технологий.</p></div>
                     <div class="" style="opacity: 1; transform: none;">
-                        <div class="flex flex-wrap gap-4" style="margin-top:34px"><a
+                        <div class="flex flex-wrap gap-4" style="margin-top:34px"><NuxtLink
                                 class="inline-flex items-center gap-3 font-bold text-white transition-transform hover:-translate-y-0.5"
                                 style="padding:17px 30px;border-radius:14px;background:var(--accent);font-size:15px;box-shadow:0 14px 32px rgba(30,136,255,0.28)"
-                                href="/robot-selection">Начать подбор
+                                to="/robot-selection">Начать подбор
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
                                  fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
                                  stroke-linejoin="round" class="lucide lucide-arrow-right">
                                 <path d="M5 12h14"></path>
                                 <path d="m12 5 7 7-7 7"></path>
                             </svg>
-                        </a><a class="inline-flex items-center gap-3 font-bold transition-transform hover:-translate-y-0.5"
+                        </NuxtLink><NuxtLink class="inline-flex items-center gap-3 font-bold transition-transform hover:-translate-y-0.5"
                                style="padding:17px 28px;border-radius:14px;font-size:15px;color:#0b1626;background:rgba(255,255,255,0.85);border:1px solid rgba(20,55,104,0.12)"
-                               href="/catalog">Смотреть каталог
+                               to="/catalog">Смотреть каталог
                             <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24"
                                  fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"
                                  stroke-linejoin="round" class="lucide lucide-layout-grid">
@@ -46,7 +46,7 @@ useHead({
                                 <rect width="7" height="7" x="14" y="14" rx="1"></rect>
                                 <rect width="7" height="7" x="3" y="14" rx="1"></rect>
                             </svg>
-                        </a></div>
+                        </NuxtLink></div>
                     </div>
                 </div>
             </div>            
@@ -54,10 +54,11 @@ useHead({
         <section class="relative z-10" style="background:#f4f8ff;margin-top:-1cm;padding:0 0 56px">
             <div class="mx-auto" style="max-width:1440px;padding:0 clamp(20px,4vw,40px)">
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;">
+                        <NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/catalog">
+                            to="/catalog">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
                             Каталог роботов</h2>
@@ -72,12 +73,12 @@ useHead({
                                                                   style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;"><NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/robot-selection">
+                            to="/robot-selection">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">Подбор робота</h2>
                             <p style="display:block;margin:0;font-size:11px;line-height:1.5;color:#596476">
@@ -91,12 +92,12 @@ useHead({
                                                                    style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;"><NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/pilot-testing">
+                            to="/pilot-testing">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
                             Пилотирование</h2>
@@ -111,12 +112,12 @@ useHead({
                                                                  style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;"><NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/financing">
+                            to="/financing">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
                             Финансирование</h2>
@@ -131,12 +132,12 @@ useHead({
                                                                       style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;"><NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/cases">
+                            to="/cases">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
                             Кейсы</h2>
@@ -151,12 +152,12 @@ useHead({
                                                                 style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
-                    <div class="h-full" style="opacity: 1; transform: none;"><a
+                    <div class="h-full" style="opacity: 1; transform: none;"><NuxtLink
                             class="rm-service-card group relative block h-full overflow-hidden transition-transform hover:-translate-y-1"
                             style="min-height:200px;padding:24px 18px 16px;border-radius:16px;background:rgba(255,255,255,0.94);border:1px solid rgba(36,83,151,0.08);box-shadow:0 16px 45px rgba(31,73,136,0.08)"
-                            href="/contacts">
+                            to="/contacts">
                         <div class="relative z-[2]" style="width:76%"><h2
                                 style="display:block;margin:0 0 8px;font-size:16px;line-height:1.2;font-weight:700;color:#0b1626">
                             Поддержка</h2>
@@ -171,7 +172,7 @@ useHead({
                                                                       style="left:18px;bottom:16px;width:28px;height:28px;border-radius:50%;background:var(--accent)"><svg
                             xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
-                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></a>
+                            class="lucide lucide-arrow-right"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></NuxtLink>
                     </div>
                 </div>
             </div>
