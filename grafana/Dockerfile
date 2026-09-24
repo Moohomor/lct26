@@ -10,8 +10,9 @@ FROM grafana/grafana:latest
 # Render требует, чтобы сервис слушал порт из $PORT, а Grafana — порт 3000.
 # Вместо dockerCommand (Render разбирает его без shell) используем свой
 # entrypoint, который подставляет $PORT в GF_SERVER_HTTP_PORT.
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY --chmod=755 start.sh /start.sh
+# (без RUN chmod: у образа grafana/grafana жёсткая корневая ФС —
+#  обычный chmod в RUN не проходит из-за Operation not permitted)
 
 ENTRYPOINT ["/start.sh"]
 
