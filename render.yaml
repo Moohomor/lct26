@@ -35,9 +35,8 @@ services:
     region: frankfurt
     dockerContext: ./grafana
     dockerfilePath: ./grafana/Dockerfile
-    # Grafana по умолчанию слушает 3000, Render требует порт из $PORT —
-    # подменяем его прямо в рантайме
-    dockerCommand: sh -c 'GF_SERVER_HTTP_PORT=$PORT /run.sh'
+    # Grafana по умолчанию слушает 3000, а Render требует порт из $PORT.
+    # Порт подменяет entrypoint /start.sh внутри образа (см. grafana/Dockerfile).
     healthCheckPath: /api/health
     envVars:
       - key: GF_SECURITY_ADMIN_USER
