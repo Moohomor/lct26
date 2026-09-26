@@ -16,33 +16,26 @@
                 </div>
 
                 <div style="position:relative">
-                    <NuxtLink to="/pilot-testing" activeClass="active" class="lb-navlink" style="font-size:13px">Пилотирование</NuxtLink>
+                    <NuxtLink to="/financing" activeClass="active" class="lb-navlink" style="font-size:13px">Финансирование</NuxtLink>
                 </div>
 
                 <div style="position:relative">
-                    <NuxtLink to="/financing" activeClass="active" class="lb-navlink" style="font-size:13px">Финансирование</NuxtLink>
+                    <NuxtLink to="/pilot-testing" activeClass="active" class="lb-navlink" style="font-size:13px">Пилотирование</NuxtLink>
                 </div>
 
                 <div style="position:relative">
                     <NuxtLink to="/cases" activeClass="active" class="lb-navlink" style="font-size:13px">Бизнес-кейсы</NuxtLink>
                 </div>
-
-                <form style="display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 10px 0 12px;margin-left:6px;border-radius:999px;background:rgba(20,32,51,0.04);border:1px solid rgba(210,220,235,0.75);transition:background 0.15s, border-color 0.15s">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                         stroke="var(--faint)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="lucide lucide-search" style="flex-shrink:0">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="m21 21-4.3-4.3"></path>
-                    </svg>
-                    <input placeholder="Поиск по сайту" aria-label="Поиск по сайту"
-                           style="width:130px;background:transparent;border:none;outline:none;color:var(--ink);font-size:13px;padding:0;transition:width 0.2s ease">
-                </form>
             </nav>
             <div class="flex items-center gap-2" style="flex-shrink:0">
 
-                <div class="hidden sm:flex items-center gap-2"><NuxtLink
+                <div class="hidden sm:flex items-center gap-2">
+                    
+                    <NuxtLink
                         style="height:36px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;border:1px solid rgba(30,136,255,0.4);color:var(--accent);background:transparent;font-size:13px;font-weight:500;transition:background 0.15s"
-                        to="/login">Войти</NuxtLink><NuxtLink
+                        to="/login">Войти</NuxtLink>
+                        
+                        <NuxtLink
                         style="height:36px;padding:0 16px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;background:var(--accent);color:#FFFFFF;font-size:13px;font-weight:600;white-space:nowrap;transition:background 0.15s"
                         to="/register">Зарегистрироваться</NuxtLink></div>
                 
