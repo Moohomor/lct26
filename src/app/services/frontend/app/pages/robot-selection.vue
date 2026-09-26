@@ -5,14 +5,9 @@ useHead({
 </script>
 
 <template>
-    <section class="relative overflow-hidden">
-            <div class="absolute inset-0 bg-cover bg-center"
-                 style="background-image: url(&quot;/ai-audit/bg.jpg&quot;);" aria-hidden="true"></div>
-            <div class="absolute inset-0" aria-hidden="true"
-                 style="background: linear-gradient(90deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.98) 44%, rgba(250, 253, 255, 0.78) 64%, rgba(244, 249, 255, 0.22) 100%);"></div>
-            <div class="absolute inset-0" aria-hidden="true"
-                 style="background: radial-gradient(circle at 42% 8%, rgba(203, 225, 255, 0.22), transparent 35%), linear-gradient(rgba(255, 255, 255, 0.06), rgba(247, 250, 255, 0.18));"></div>
-            <div class="container relative py-8 lg:py-10">
+    <section class="relative overflow-hidden" style="margin-top: -76px;">
+            <div class="mx-auto relative py-8 lg:py-10" style="max-width: 1440px;
+  padding: 106px clamp(20px, 4vw, 40px) 40px;">
                 <div class="mb-6 max-w-3xl">
                     <h1 class="mt-3.5 text-[clamp(34px,3.35vw,58px)] font-extrabold leading-[1.05] tracking-[-0.035em] text-ink">Подбор робота</h1>
                     <p class="mt-3 text-[16px] leading-[1.65] text-sub">Собираем данные, анализируем ваши процессы<br class="hidden lg:inline"> и выявляем точки роста, автоматизации и экономического эффекта.</p></div>
@@ -214,7 +209,7 @@ useHead({
                         <div class="mt-4 flex flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:gap-5">
                             <button type="submit"
                                     class="inline-flex h-[43px] min-w-[240px] items-center justify-between gap-3 rounded-[7px] px-5 text-[14px] font-semibold text-accent-ink shadow-[0_10px_24px_rgba(8,101,245,0.20)] transition-all hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
-                                    style="background: linear-gradient(135deg, var(--accent), #0059EE);"><span
+                                    style="background: var(--accent);"><span
                                     class="inline-flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg"
                                                                                 width="24" height="24"
                                                                                 viewBox="0 0 24 24" fill="none"

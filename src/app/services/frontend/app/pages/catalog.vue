@@ -10,9 +10,7 @@ useHead({
                 <div class="rmc-shell">
                     <section class="rmc-hero">
                         <div><h1 class="rmc-h1">Каталог роботов</h1>
-                            <p class="rmc-lead">Выбирайте
-                                оптимальное роботизированное решение под ваши задачи. Сравнивайте
-                                характеристики, цены и предложения от проверенных поставщиков.</p></div>
+                            <p class="rmc-lead">Подберите идеальную автоматизацию для вашего бизнеса. Анализируйте технические параметры, стоимость и условия от надежных поставщиков в одном месте.</p></div>
                         <div class="rmc-stats">
                             <article class="rmc-stat"><span class="rmc-stat-icon"><svg
                                     xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -56,16 +54,17 @@ useHead({
                                     </NuxtLink>
                         </div>
                     </section>
-                    <section class="rmc-panel">
-                        <div class="rmc-filters"><label class="rmc-search">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="lucide lucide-search">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <path d="m21 21-4.3-4.3"></path>
-                            </svg>
-                            <input placeholder="Поиск роботов по названию, типу, задаче..." aria-label="Поиск роботов"
-                                   type="search"></label><label class="rmc-field"><span>Категория</span><select>
+
+                    <div style="margin-top:1rem; margin-bottom: 1rem;;">
+                        <label class="rmc-search" data-v-0a7a8d37=""><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" data-v-0a7a8d37=""><circle cx="11" cy="11" r="8" data-v-0a7a8d37=""></circle><path d="m21 21-4.3-4.3" data-v-0a7a8d37=""></path></svg><input placeholder="Поиск роботов..." aria-label="Поиск роботов" type="search" data-v-0a7a8d37="">
+                    </label>
+                    </div>
+                    
+
+                    <div class="rmc-filter-panel flex gap-3">
+                        <div class="rmc-filter-panel__sidebar_left">
+                            <section class="rmc-panel">
+                        <div class="rmc-filters"><label class="rmc-field"><span>Категория</span><select>
                             <option value="" selected="selected">Все категории</option>
                             <option value="Промышленные роботы">Промышленные роботы</option>
                             <option value="Сервисные роботы">Сервисные роботы</option>
@@ -387,7 +386,7 @@ useHead({
                                     d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path
                                     d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path
                                     d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path></svg></span><span
-                                    class="rmc-tab-text">Сервисные роботы<small>190</small></span></button>
+                                    class="rmc-tab-text">Строительные роботы<small>190</small></span></button>
                             <button type="button" aria-pressed="false" class="rmc-tab"><span class="rmc-tab-icon"><svg
                                     xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -396,7 +395,7 @@ useHead({
                                     d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path
                                     d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path
                                     d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path></svg></span><span
-                                    class="rmc-tab-text">Коллаборативные роботы<small>88</small></span></button>
+                                    class="rmc-tab-text">Транспортнологистические роботы<small>88</small></span></button>
                             <button type="button" aria-pressed="false" class="rmc-tab"><span class="rmc-tab-icon"><svg
                                     xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -405,33 +404,13 @@ useHead({
                                     d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path
                                     d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path
                                     d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path></svg></span><span
-                                    class="rmc-tab-text">Инспекционные роботы<small>85</small></span></button>
-                            <button type="button" aria-pressed="false" class="rmc-tab"><span class="rmc-tab-icon"><svg
-                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-store"><path
-                                    d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path><path
-                                    d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><path
-                                    d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path><path d="M2 7h20"></path><path
-                                    d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path></svg></span><span
-                                    class="rmc-tab-text">Уборочные роботы<small>74</small></span></button>
-                            <button type="button" aria-pressed="false" class="rmc-tab"><span class="rmc-tab-icon"><svg
-                                    xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="lucide lucide-boxes"><path
-                                    d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path
-                                    d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path
-                                    d="M7 16.5v5.17"></path><path
-                                    d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path
-                                    d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path
-                                    d="M17 16.5v5.17"></path><path
-                                    d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path
-                                    d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path
-                                    d="M12 13.5V8"></path></svg></span><span class="rmc-tab-text">Другие роботы<small>251</small></span>
-                            </button>
+                                    class="rmc-tab-text">ТЭК роботы<small>85</small></span></button>
                         </div>
                     </section>
-                    <div class="rmc-resulthead">
+                        </div>
+
+                        <div>
+                            <div class="rmc-resulthead">
                         <div>Найдено роботов: <b>955</b></div>
                         <div class="rmc-resultctl">Сортировать:<select aria-label="Сортировка">
                             <option value="popular" selected="selected">По популярности</option>
@@ -817,6 +796,359 @@ useHead({
                                             d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
                             </div>
                         </article>
+                        <article class="rmc-card"><span class="rmc-badge">★ Хит продаж</span><span class="rmc-fav"><button
+                                type="button" aria-pressed="false" aria-label="Добавить PUDU CC1 Pro к сравнению"
+                                title="Добавить к сравнению"
+                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="PUDU CC1 Pro" loading="lazy" decoding="async"
+                                                         data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_035.avif 384w, ~/assets/img/image-1_041.avif 640w, ~/assets/img/image-1_003.avif 750w, ~/assets/img/image-1_019.avif 828w, ~/assets/img/image-1_012.avif 1080w, ~/assets/img/image-1_016.avif 1200w, ~/assets/img/image-1_020.avif 1920w, ~/assets/img/image-1_053.avif 2048w, ~/assets/img/image-1_024.avif 3840w"
+                                                         src="~/assets/img/image-1_024.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch"
+                                                         href="/robots/pudu-cc1-pro">PUDU CC1
+                                Pro</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Автономный
+                                    моечный робот премиум-класса с ИИ-распознаванием загрязнений и
+                                    навигацией VSLAM+ для профессиональной уборки коммерческих помещений.</p>
+                                <div class="rmc-tags">
+                                    <span>Уборочные роботы</span><span>Ритейл</span><span>HoReCa</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">Цена по запросу</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 1 поставщика ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
+                        <article class="rmc-card"><span class="rmc-badge">★ Хит продаж</span><span class="rmc-fav"><button
+                                type="button" aria-pressed="false" aria-label="Добавить Pudu D5 к сравнению"
+                                title="Добавить к сравнению"
+                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="Pudu D5" loading="lazy" decoding="async" data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_052.avif 384w, ~/assets/img/image-1_045.avif 640w, ~/assets/img/image-1_046.avif 750w, ~/assets/img/image-1_032.avif 828w, ~/assets/img/image-1.avif 1080w, ~/assets/img/image-1_022.avif 1200w, ~/assets/img/image-1_031.avif 1920w, ~/assets/img/image-1_029.avif 2048w, ~/assets/img/image-1_014.avif 3840w"
+                                                         src="~/assets/img/image-1_014.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch" href="/robots/pudu-d5">Pudu
+                                D5</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Pudu
+                                    D5 — индустриальный автономный робопёс, который самостоятельно
+                                    ориентируется в пространстве, безопасно движется по сложным маршрутам,
+                                    взаимодействует с людьми голосом и жестам</p>
+                                <div class="rmc-tags"><span>Инспекционные роботы</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">Цена по запросу</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 1 поставщика ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
+                        <article class="rmc-card"><span class="rmc-fav"><button type="button" aria-pressed="false"
+                                                                                aria-label="Добавить Робот доставщик Pudu HolaBot к сравнению"
+                                                                                title="Добавить к сравнению"
+                                                                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="Робот доставщик Pudu HolaBot" loading="lazy"
+                                                         decoding="async" data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_036.avif 384w, ~/assets/img/image-1_050.avif 640w, ~/assets/img/image-1_017.avif 750w, ~/assets/img/image-1_023.avif 828w, ~/assets/img/image-1_009.avif 1080w, ~/assets/img/image-1_044.avif 1200w, ~/assets/img/image-1_034.avif 1920w, ~/assets/img/image-1_054.avif 2048w, ~/assets/img/image-1_025.avif 3840w"
+                                                         src="~/assets/img/image-1_025.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch"
+                                                         href="/robots/robot-dostavshik-pudu-holabot">Робот
+                                доставщик Pudu HolaBot</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Pudu
+                                    Holabot – интеллектуальный робот-помощник, способный выполнять уборку,
+                                    доставку товаров и другие сервисные задачи для автоматизации бытовых и
+                                    коммерческих процессов.</p>
+                                <div class="rmc-tags"><span>Сервисные роботы</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">от 783&nbsp;576 ₽</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 3 поставщиков ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
+                        <article class="rmc-card"><span class="rmc-fav"><button type="button" aria-pressed="false"
+                                                                                aria-label="Добавить Робот официант Pudu Bella Bot Pro к сравнению"
+                                                                                title="Добавить к сравнению"
+                                                                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="Робот официант Pudu Bella Bot Pro" loading="lazy"
+                                                         decoding="async" data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_033.avif 384w, ~/assets/img/image-1_040.avif 640w, ~/assets/img/image-1_028.avif 750w, ~/assets/img/image-1_018.avif 828w, ~/assets/img/image-1_011.avif 1080w, ~/assets/img/image-1_048.avif 1200w, ~/assets/img/image-1_047.avif 1920w, ~/assets/img/image-1_039.avif 2048w, ~/assets/img/image-1_015.avif 3840w"
+                                                         src="~/assets/img/image-1_015.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch"
+                                                         href="/robots/robot-oficiant-pudu-bella-bot-pro">Робот
+                                официант Pudu Bella Bot Pro</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Pudu
+                                    BellaBot помогает автоматизировать процесс доставки заказов внутри
+                                    заведения, снижая нагрузку на персонал и ускоряя обслуживание клиентов.</p>
+                                <div class="rmc-tags"><span>Сервисные роботы</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">от 940&nbsp;291 ₽</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 3 поставщиков ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
+                        <article class="rmc-card"><span class="rmc-fav"><button type="button" aria-pressed="false"
+                                                                                aria-label="Добавить Робот уборщик Pudu MT1 к сравнению"
+                                                                                title="Добавить к сравнению"
+                                                                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="Робот уборщик Pudu MT1" loading="lazy" decoding="async"
+                                                         data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_042.avif 384w, ~/assets/img/image-1_037.avif 640w, ~/assets/img/image-1_006.avif 750w, ~/assets/img/image-1_027.avif 828w, ~/assets/img/image-1_005.avif 1080w, ~/assets/img/image-1_010.avif 1200w, ~/assets/img/image-1_026.avif 1920w, ~/assets/img/image-1_013.avif 2048w, ~/assets/img/image-1_038.avif 3840w"
+                                                         src="~/assets/img/image-1_038.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch"
+                                                         href="/robots/robot-uborshik-pudu-mt1">Робот
+                                уборщик Pudu MT1</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Pudu MT1 — это высокотехнологичный, автономный робот для сухой
+                                    уборки, управляемый искусственным интеллектом.</p>
+                                <div class="rmc-tags"><span>Сервисные роботы</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">от 1&nbsp;527&nbsp;973 ₽</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 3 поставщиков ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
+                        <article class="rmc-card"><span class="rmc-fav"><button type="button" aria-pressed="false"
+                                                                                aria-label="Добавить Робот уборщик Pudu MT1VAC к сравнению"
+                                                                                title="Добавить к сравнению"
+                                                                                class="flex items-center justify-center h-7 rounded border transition-all border-white/70 bg-white/60 text-[#0568FF] hover:bg-white !h-[28px] w-[28px] !rounded-[8px]"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-git-compare h-3.5 w-3.5"><circle cx="18"
+                                                                                                              cy="18"
+                                                                                                              r="3"></circle><circle
+                                cx="6" cy="6" r="3"></circle><path d="M13 6h3a2 2 0 0 1 2 2v7"></path><path
+                                d="M11 18H8a2 2 0 0 1-2-2V9"></path></svg></button><button
+                                title="Добавить в вотчлист (Следить)"
+                                class="flex items-center justify-center h-7 rounded border transition-all text-faint hover:text-sub hover:border-line !h-[28px] w-[28px] !rounded-[8px] border-white/70 bg-white/60"><svg
+                                xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round" class="lucide lucide-bell h-3 w-3"><path
+                                d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path
+                                d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></button></span>
+                            <div class="rmc-visual"><img alt="Робот уборщик Pudu MT1VAC" loading="lazy" decoding="async"
+                                                         data-nimg="fill"
+                                                         style="position: absolute; height: 100%; width: 100%; inset: 0px; object-fit: contain; color: transparent;"
+                                                         sizes="(max-width: 720px) 100vw, (max-width: 1100px) 50vw, 460px"
+                                                         srcset="~/assets/img/image-1_043.avif 384w, ~/assets/img/image-1_004.avif 640w, ~/assets/img/image-1_049.avif 750w, ~/assets/img/image-1_021.avif 828w, ~/assets/img/image-1_002.avif 1080w, ~/assets/img/image-1_008.avif 1200w, ~/assets/img/image-1_051.avif 1920w, ~/assets/img/image-1_030.avif 2048w, ~/assets/img/image-1_007.avif 3840w"
+                                                         src="~/assets/img/image-1_007.avif"></div>
+                            <div class="rmc-body"><h3><a class="rmc-stretch"
+                                                         href="/robots/robot-uborshik-pudu-mt1vac">Робот
+                                уборщик Pudu MT1VAC</a></h3>
+                                <p class="rmc-maker">Pudu Robotics · Китай</p>
+                                <p class="rmc-desc">Коммерческий робот-пылесос PUDU MT1 Vac с двойной системой
+                                    всасывания, HEPA-фильтрацией и AI-навигацией.</p>
+                                <div class="rmc-tags"><span>Сервисные роботы</span></div>
+                                <div class="rmc-foot">
+                                    <div>
+                                        <div class="rmc-price">от 1&nbsp;000&nbsp;000 ₽</div>
+                                        <div class="rmc-sup">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11"
+                                                 viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                 stroke-linecap="round" stroke-linejoin="round"
+                                                 class="lucide lucide-store">
+                                                <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
+                                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                                <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
+                                                <path d="M2 7h20"></path>
+                                                <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
+                                            </svg>
+                                            от 3 поставщиков ›
+                                        </div>
+                                    </div>
+                                    <span class="rmc-go" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg"
+                                                                                 width="14" height="14"
+                                                                                 viewBox="0 0 24 24" fill="none"
+                                                                                 stroke="currentColor" stroke-width="2"
+                                                                                 stroke-linecap="round"
+                                                                                 stroke-linejoin="round"
+                                                                                 class="lucide lucide-arrow-right"><path
+                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span></div>
+                            </div>
+                        </article>
                     </section>
                     <nav class="rmc-pages" aria-label="Страницы каталога">
                         <button type="button" aria-label="Предыдущая страница" disabled="disabled">
@@ -839,6 +1171,9 @@ useHead({
                             </svg>
                         </button>
                     </nav>
+                        </div>
+                    </div>
+                    
                 </div>
                 
             </div>
@@ -867,8 +1202,8 @@ useHead({
                     .rmc-stat-link { text-decoration: none; transition: transform .18s; }
                     .rmc-stat-link:hover { transform: translateY(-2px); }
                     .rmc-stat-icon { display: grid; place-items: center; width: 32px; height: 32px; flex: 0 0 32px;
-                      border-radius: 10px; background: rgba(255,255,255,0.8); color: #0B64F4; }
-                    .rmc-stat b { display: block; font-size: 19px; font-weight: 800; color: #0B64F4; letter-spacing: -0.02em; line-height: 1.1; }
+                      border-radius: 10px; background: rgba(255,255,255,0.8); color: var(--accent); }
+                    .rmc-stat b { display: block; font-size: 19px; font-weight: 800; color: var(--accent); letter-spacing: -0.02em; line-height: 1.1; }
                     .rmc-stat-small { font-size: 13.5px !important; }
                     .rmc-stat-label { display: block; margin-top: 2px; font-size: 10px; line-height: 1.3; color: #2E3E56; }
 
@@ -876,7 +1211,7 @@ useHead({
                     .rmc-panel { margin-top: 8px; border: 1px solid rgba(255,255,255,0.68); border-radius: 17px;
                       background: linear-gradient(145deg, rgba(255,255,255,0.62), rgba(225,239,252,0.45));
                       backdrop-filter: blur(28px); box-shadow: inset 0 1px 0 #fff, 0 18px 44px rgba(45,75,115,0.10); overflow: hidden; }
-                    .rmc-filters { display: grid; grid-template-columns: 1.7fr repeat(3, 1fr) 150px; gap: 12px;
+                    .rmc-filters {display: grid; gap: 12px;
                       align-items: end; padding: 12px 13px 8px; }
                     .rmc-field { display: block; min-width: 0; }
                     .rmc-field > span { display: block; margin-bottom: 4px; font-size: 10.5px; color: #5B6C86; }
@@ -896,22 +1231,22 @@ useHead({
                       color: #0B64F4; font-size: 12px; font-weight: 600; background: transparent; border: 0; }
 
                     /* Семь вкладок в одну строку — как в референсе */
-                    .rmc-tabs { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; padding: 0 13px 8px; }
+                    .rmc-tabs { display: grid; gap: 6px; padding: 0 13px 8px; }
                     .rmc-tab { display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 6px 8px; cursor: pointer;
                       text-align: left; border: 1px solid rgba(255,255,255,0.55); border-radius: 11px;
                       background: rgba(255,255,255,0.38); color: #22314A; font: inherit; min-width: 0; }
-                    .rmc-tab-active { border-color: #659CFF; background: rgba(255,255,255,0.72); box-shadow: 0 8px 22px rgba(65,105,165,0.08); }
+                    .rmc-tab-active { border-color: var(--accent); background: rgba(255,255,255,0.72); box-shadow: 0 8px 22px rgba(65,105,165,0.08); }
                     .rmc-tab-icon { display: grid; place-items: center; width: 27px; height: 27px; flex: 0 0 27px;
-                      border-radius: 8px; background: rgba(255,255,255,0.75); color: #0B64F4; }
+                      border-radius: 8px; background: rgba(255,255,255,0.75); color: var(--accent); }
                     .rmc-tab-text { min-width: 0; font-size: 10px; font-weight: 700; line-height: 1.2;
                       display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
                     .rmc-tab-text small { display: block; margin-top: 3px; font-size: 10.5px; font-weight: 600; color: #47607F; }
 
                     /* ── Строка результатов ──────────────────────────────────────────────────── */
                     .rmc-resulthead { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;
-                      gap: 8px; padding: 5px 4px 4px; font-size: 12px; color: #33445F; }
-                    .rmc-resulthead b { color: #0B64F4; }
-                    .rmc-resultctl { display: flex; align-items: center; gap: 8px; }
+                      gap: 8px; padding: 5px 4px 9px; font-size: 12px; color: #33445F; }
+                    .rmc-resulthead b { color: var(--accent); }
+                    .rmc-resultctl { display: flex; align-items: center; gap: 8px; color: #e8f3ff;}
                     .rmc-resultctl select { height: 32px; border: 1px solid rgba(255,255,255,0.72); border-radius: 8px;
                       background: rgba(255,255,255,0.62); padding: 0 10px; font: inherit; font-size: 12px; color: #111A31; outline: 0; }
                     .rmc-v { display: grid; place-items: center; width: 32px; height: 32px; cursor: pointer;
@@ -947,7 +1282,7 @@ useHead({
                     .rmc-tags { display: flex; gap: 5px; flex-wrap: wrap; max-height: 20px; overflow: hidden; }
                     .rmc-tags span { padding: 3px 6px; border-radius: 6px; background: rgba(245,248,253,0.8); font-size: 9.5px; color: #46566F; white-space: nowrap; }
                     .rmc-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 6px; }
-                    .rmc-price { color: #0B64F4; font-size: 16.5px; font-weight: 800; letter-spacing: -0.02em; }
+                    .rmc-price { color: var(--accent); font-size: 16.5px; font-weight: 800; letter-spacing: -0.02em; }
                     .rmc-sup { display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 10px; color: #52657F; }
                     .rmc-go { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border-radius: 9px;
                       background: rgba(255,255,255,0.72); border: 1px solid rgba(255,255,255,0.85); color: #0B64F4; }
@@ -970,15 +1305,26 @@ useHead({
                     .rmc-pages button:disabled { opacity: 0.4; cursor: default; }
                     .rmc-page-active { color: #fff !important; background: linear-gradient(135deg,#2B82FF,#075CF0) !important; border-color: transparent !important; font-weight: 700; }
                     .rmc-gap { color: #7A8AA3; }
+                    .rmc-filter-panel__sidebar_left {
+                        width: 50rem;
+                      }
 
                     @media (max-width: 1280px) {
                       .rmc-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+                      .rmc-filter-panel {
+                        flex-direction: column;
+                      }
+                      .rmc-filter-panel__sidebar_left {
+                        width: 100%;
+                      }
+
                     }
                     @media (max-width: 1100px) {
                       .rmc-hero { grid-template-columns: 1fr; gap: 18px; }
                       .rmc-filters { grid-template-columns: 1fr 1fr; }
                       .rmc-search { grid-column: 1 / -1; }
                       .rmc-grid { grid-template-columns: repeat(2, 1fr); }
+
                     }
                     @media (max-width: 720px) {
                       .rmc-shell { width: calc(100% - 20px); }

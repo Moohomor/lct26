@@ -43,6 +43,15 @@ const store = useHeaderMobileMenuStore()
         </svg>
         <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Подбор робота</span></NuxtLink>
 
+        <NuxtLink to="/financing" style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 10px; text-decoration: none; background: transparent; border: 1px solid transparent; margin-bottom: 4px; transition: background 0.15s;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+             stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             class="lucide lucide-wallet">
+            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
+            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
+        </svg>
+        <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Финансирование</span></NuxtLink>
+
         <NuxtLink to="/pilot-testing" style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 10px; text-decoration: none; background: transparent; border: 1px solid transparent; margin-bottom: 4px; transition: background 0.15s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
              stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -52,15 +61,6 @@ const store = useHeaderMobileMenuStore()
             <path d="M7 16h10"></path>
         </svg>
         <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Пилотирование</span></NuxtLink>
-        
-        <NuxtLink to="/financing" style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 10px; text-decoration: none; background: transparent; border: 1px solid transparent; margin-bottom: 4px; transition: background 0.15s;">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="var(--sub)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             class="lucide lucide-wallet">
-            <path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"></path>
-            <path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"></path>
-        </svg>
-        <span style="font-size: 14.5px; font-weight: 600; color: var(--ink);">Финансирование</span></NuxtLink>
         
         <NuxtLink to="/cases" style="display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-radius: 10px; text-decoration: none; background: transparent; border: 1px solid transparent; margin-bottom: 4px; transition: background 0.15s;">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
