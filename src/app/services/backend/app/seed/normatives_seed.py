@@ -330,6 +330,58 @@ SENSITIVITY_PARAMS: tuple[tuple[str, str, str], ...] = (
     ("labor_cost", "Стоимость персонала", "__labor__"),
 )
 
+#: Допустимые границы коэффициента. Один и тот же словарь отвечает на два
+#: вопроса: «можно ли администратору поставить такое значение» (ТЗ 3.5.8) и
+#: «в каком диапазоне пользователь может переопределить допущение сценария».
+#: Дублировать эти числа в двух местах означает рано или поздно разрешить
+#: пользователю то, что админка считает опечаткой.
+NORMATIVE_RANGES: dict[str, tuple[Decimal, Decimal]] = {
+    "calc.horizon_years": (Decimal("1"), Decimal("15")),
+    "calc.vat_rate": (Decimal("0"), Decimal("40")),
+    "payroll.multiplier": (Decimal("1"), Decimal("2.5")),
+    "capex.software_pct": (Decimal("0"), Decimal("40")),
+    "capex.integration_pct": (Decimal("0"), Decimal("50")),
+    "capex.commissioning_pct": (Decimal("0"), Decimal("30")),
+    "capex.training_pct": (Decimal("0"), Decimal("20")),
+    "capex.reserve_pct": (Decimal("0"), Decimal("30")),
+    "capex.amortization_years": (Decimal("1"), Decimal("15")),
+    "capex.solution_lifetime_years": (Decimal("1"), Decimal("20")),
+    "capex.battery_lifetime_years": (Decimal("1"), Decimal("10")),
+    "opex.service_pct": (Decimal("0"), Decimal("50")),
+    "opex.software_license_pct": (Decimal("0"), Decimal("40")),
+    "opex.energy_price_kwh": (Decimal("0"), Decimal("100")),
+    "raas.rate_pct_of_capex_per_year": (Decimal("5"), Decimal("80")),
+    "raas.term_months": (Decimal("1"), Decimal("120")),
+    "finance.discount_rate": (Decimal("0"), Decimal("1")),
+    "sizing.load_factor": (Decimal("0.3"), Decimal("1")),
+    "sizing.availability": (Decimal("0.5"), Decimal("1")),
+    "effect.headcount_fte_per_robot": (Decimal("0.1"), Decimal("10")),
+    "effect.maintenance_pct_capex": (Decimal("0"), Decimal("30")),
+    "labor.forklift_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.operator_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.warehouse_worker_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.picker_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.loader_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.driver_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.nurse_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.doctor_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.orderly_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.sanitary_salary_rub": (Decimal("10000"), Decimal("500000")),
+    "labor.total_headcount": (Decimal("1"), Decimal("10000")),
+}
+
+
+#: Границы переопределения допущения в сценарии. По умолчанию совпадают с
+#: диапазонами админки, и расходятся только там, где пользователь двигает не
+#: сам коэффициент, а множитель к нему: анализ чувствительности по ТЗ 3.5.9
+#: обязан отклонять параметр и вниз, и вверх, поэтому «зарплата × 0,7» —
+#: законный результат расчёта, а «коэффициент начислений = 0,7» — опечатка,
+#: которую администратору видно, и она отвергается.
+SCENARIO_RANGES: dict[str, tuple[Decimal, Decimal]] = {
+    **NORMATIVE_RANGES,
+    "payroll.multiplier": (Decimal("0.5"), Decimal("2.5")),
+}
+
 
 def by_code() -> dict[str, NormativeDef]:
     return {n.code: n for n in NORMATIVES}

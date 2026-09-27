@@ -63,7 +63,8 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def _validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
-        first = exc.errors()[0] if exc.errors() else {}
+        errors = _jsonable_errors(exc.errors())
+        first = errors[0] if errors else {}
         loc = ".".join(str(p) for p in first.get("loc", [])[1:]) or "тело запроса"
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -71,6 +72,28 @@ def register_exception_handlers(app: FastAPI) -> None:
                 "validation_error",
                 f"Проверьте значение поля «{loc}»: {first.get('msg', 'некорректное значение')}",
                 hint="Сверьтесь с единицами измерения и допустимым диапазоном поля.",
-                details=exc.errors(),
+                details=errors,
             ),
         )
+
+
+def _jsonable_errors(errors: list[dict]) -> list[dict]:
+    """Приводит описание ошибки валидации к тому, что сериализуется в JSON.
+
+    В `ctx` pydantic кладёт исходное исключение (`ValueError`), а `input`
+    может быть любым объектом — оба ломают `json.dumps` и превращают
+    понятный ответ 422 в 500. Пользователю полезнее увидеть текст ошибки,
+    чем трассировку сериализации.
+    """
+    out: list[dict] = []
+    for err in errors:
+        item = {
+            "loc": [str(p) for p in err.get("loc", ())],
+            "msg": str(err.get("msg", "")),
+            "type": str(err.get("type", "")),
+        }
+        ctx = err.get("ctx")
+        if isinstance(ctx, dict):
+            item["ctx"] = {k: str(v) for k, v in ctx.items()}
+        out.append(item)
+    return out

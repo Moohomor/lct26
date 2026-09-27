@@ -42,8 +42,14 @@ class Project(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     description: Mapped[str | None] = mapped_column(Text)
+    organization: Mapped[str | None] = mapped_column(String(255))
+    # draft | in_progress | calculated | archived
+    status: Mapped[str] = mapped_column(String(32), default="draft", index=True, nullable=False)
     # {"<code параметра>": значение} — форма и импорт пишут сюда
     parameters: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
+    # процессы объекта, выбранные для роботизации: они определяют требования
+    # к решениям и состав базового сценария
+    process_codes: Mapped[list] = mapped_column(JSONB, default=list, nullable=False)
     # версия справочника параметров на момент заполнения (воспроизводимость, ТЗ 3.1.5)
     params_version: Mapped[str | None] = mapped_column(String(32))
     is_demo: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
@@ -117,10 +123,13 @@ class Scenario(IntPrimaryKeyMixin, TimestampMixin, Base):
     )
 
 
-class ScenarioSolution(UUIDPrimaryKeyMixin, Base):
+class ScenarioSolution(IntPrimaryKeyMixin, Base):
     """Состав оборудования сценария."""
 
     __tablename__ = "scenario_solutions"
+    __table_args__ = (
+        UniqueConstraint("scenario_id", "solution_id", name="uq_scenario_solution"),
+    )
 
     scenario_id: Mapped[int] = mapped_column(
         ForeignKey("scenarios.id", ondelete="CASCADE"), index=True, nullable=False
@@ -130,6 +139,10 @@ class ScenarioSolution(UUIDPrimaryKeyMixin, Base):
     )
     # сколько единиц нужно по расчёту sizing
     quantity: Mapped[Decimal] = mapped_column(Numeric(10, 2), default=Decimal("1"))
+    # количество, зафиксированное пользователем: sizing не имеет права
+    # пересчитывать то, что человек осознанно задал руками
+    is_locked: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    note: Mapped[str | None] = mapped_column(Text)
 
     scenario: Mapped[Scenario] = relationship(back_populates="solutions")
     solution: Mapped[Solution] = relationship()
@@ -147,9 +160,18 @@ class Calculation(IntPrimaryKeyMixin, Base):
     scenario_id: Mapped[int] = mapped_column(
         ForeignKey("scenarios.id", ondelete="CASCADE"), index=True, nullable=False
     )
+    user_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), index=True
+    )
+    # Дублируют ключевые цифры из `result`, чтобы список расчётов не требовал
+    # распаковки JSONB для каждой строки. `result` остаётся источником истины.
+    kind: Mapped[str] = mapped_column(String(32), default="purchase", nullable=False)
     model_version: Mapped[str] = mapped_column(String(32), nullable=False)
     catalog_version: Mapped[str | None] = mapped_column(String(64))
     params_version: Mapped[str | None] = mapped_column(String(32))
+    capex_total: Mapped[Decimal | None] = mapped_column(Numeric(16, 2))
+    annual_effect: Mapped[Decimal | None] = mapped_column(Numeric(16, 2))
+    payback_years: Mapped[Decimal | None] = mapped_column(Numeric(8, 2))
     input_snapshot: Mapped[dict] = mapped_column(JSONB, nullable=False)
     result: Mapped[dict] = mapped_column(JSONB, nullable=False)
     duration_ms: Mapped[int | None] = mapped_column(Integer)

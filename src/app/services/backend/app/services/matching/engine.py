@@ -131,23 +131,46 @@ def _fmt(value: float | None, digits: int = 2) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def _unknown(req: Requirement, required: str, what: str) -> RequirementCheck:
+    """Проверка, для которой в каталоге нет подтверждённого значения.
+
+    Единое правило для всех проверок: отсутствие данных — это не отказ.
+    Каталог организатора заполнен выборочно, и решение с незаполненной
+    грузоподъёмностью не перестаёт быть решением. Если бы «нет данных» значило
+    «не подходит», подбор на реальном каталоге возвращал бы пустоту: из 190
+    позиций склада половина отсеивалась бы не по существу, а по пробелу в
+    анкете.
+
+    Отказом такое требование не считается, но оно попадает в предупреждения и
+    снимает баллы в компоненте «полнота данных» — пользователь видит, что
+    характеристику нужно подтвердить у поставщика, и решение остаётся в
+    выдаче.
+    """
+    return RequirementCheck(
+        requirement_code=req.code,
+        label=req.label,
+        passed=False,
+        severity="warning",
+        message=f"{req.label}: {what} — подтвердите по документации поставщика",
+        required=required,
+        actual=None,
+    )
+
+
 def _check_payload(req: Requirement, sol: Solution) -> RequirementCheck:
     actual = _num(sol.payload_kg)
     need = req.minimum or 0.0
-    ok = actual is not None and actual >= need
-    message = (
-        f"Грузоподъёмность {_fmt(actual, 0)} кг против требуемых {_fmt(need, 0)} кг"
-        if actual is not None
-        else "Грузоподъёмность в данных не подтверждена"
-    )
+    if actual is None:
+        return _unknown(req, f"≥ {_fmt(need, 0)} кг", "грузоподъёмность в данных не указана")
+    ok = actual >= need - 1e-9
     return RequirementCheck(
         requirement_code=req.code,
         label=req.label,
         passed=ok,
         severity=req.severity,
-        message=message,
+        message=f"Грузоподъёмность {_fmt(actual, 0)} кг против требуемых {_fmt(need, 0)} кг",
         required=f"≥ {_fmt(need, 0)} кг",
-        actual=f"{_fmt(actual, 0)} кг" if actual is not None else None,
+        actual=f"{_fmt(actual, 0)} кг",
     )
 
 
@@ -174,14 +197,8 @@ def _check_passage(req: Requirement, sol: Solution, object_type: str) -> Require
             margin = float(sol.solution_type.passage_margin_m) if sol.solution_type else 0.3
             actual = width + margin
         else:
-            return RequirementCheck(
-                requirement_code=req.code,
-                label=req.label,
-                passed=False,
-                severity="blocker",
-                message="Габариты решения в данных не подтверждены — проезд проверить нельзя",
-                required=f"≤ {_fmt(available)} м",
-                actual=None,
+            return _unknown(
+                req, f"≤ {_fmt(available)} м", "габариты не указаны, проезд проверить нельзя"
             )
     ok = actual <= available + 1e-9
     return RequirementCheck(
@@ -204,18 +221,7 @@ def _check_maximum(req: Requirement, sol: Solution) -> RequirementCheck:
     limit = req.maximum or 0.0
     actual = _num(getattr(sol, _SOLUTION_FIELD.get(req.code, ""), None))
     if actual is None:
-        return RequirementCheck(
-            requirement_code=req.code,
-            label=req.label,
-            passed=False,
-            severity=req.severity if req.severity == "blocker" else "warning",
-            message=(
-                f"{req.label}: подтверждённое значение в данных отсутствует — "
-                "нужно подтверждение поставщика"
-            ),
-            required=f"≤ {_fmt(limit)}",
-            actual=None,
-        )
+        return _unknown(req, f"≤ {_fmt(limit)}", "подтверждённое значение в данных отсутствует")
     ok = actual <= limit + 1e-9
     return RequirementCheck(
         requirement_code=req.code,
@@ -238,14 +244,8 @@ def _check_minimum(req: Requirement, sol: Solution) -> RequirementCheck:
         min_t = _num(sol.min_temp_c)
         max_t = _num(sol.max_temp_c)
         if min_t is None and max_t is None:
-            return RequirementCheck(
-                requirement_code=req.code,
-                label=req.label,
-                passed=False,
-                severity="blocker",
-                message="Диапазон рабочих температур в данных не подтверждён",
-                required=f"≤ {_fmt(need, 0)} °C",
-                actual=None,
+            return _unknown(
+                req, f"≤ {_fmt(need, 0)} °C", "диапазон рабочих температур не указан"
             )
         ok = (max_t is not None and max_t <= need + 1e-9) or (
             min_t is not None and min_t <= need + 1e-9
@@ -263,15 +263,7 @@ def _check_minimum(req: Requirement, sol: Solution) -> RequirementCheck:
             actual=f"{_fmt(min_t, 0)}…{_fmt(max_t, 0)} °C",
         )
     if actual is None:
-        return RequirementCheck(
-            requirement_code=req.code,
-            label=req.label,
-            passed=False,
-            severity="info",
-            message=f"{req.label}: значение не подтверждено, проверьте по документации поставщика",
-            required=f"≥ {_fmt(need)}",
-            actual=None,
-        )
+        return _unknown(req, f"≥ {_fmt(need)}", "значение не подтверждено")
     ok = actual >= need - 1e-9
     return RequirementCheck(
         requirement_code=req.code,
@@ -292,15 +284,7 @@ def _check_flag(req: Requirement, sol: Solution) -> RequirementCheck:
     }.get(req.code)
     actual = getattr(sol, field_name, None) if field_name else None
     if actual is None:
-        return RequirementCheck(
-            requirement_code=req.code,
-            label=req.label,
-            passed=False,
-            severity=req.severity,
-            message=f"{req.label}: подтверждение в данных отсутствует",
-            required="подтверждено",
-            actual=None,
-        )
+        return _unknown(req, "подтверждено", "подтверждение в данных отсутствует")
     return RequirementCheck(
         requirement_code=req.code,
         label=req.label,

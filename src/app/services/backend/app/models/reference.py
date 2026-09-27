@@ -95,10 +95,21 @@ class Parameter(IntPrimaryKeyMixin, TimestampMixin, Base):
     default_text: Mapped[str | None] = mapped_column(Text)
     min_value: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
     max_value: Mapped[Decimal | None] = mapped_column(Numeric(20, 4))
+    # Шаг ввода для ползунков и счётчиков. Держится рядом с диапазоном, а не
+    # в интерфейсе: иначе у одного и того же параметра в двух экранах будут
+    # разные шаги.
+    step: Mapped[Decimal | None] = mapped_column(Numeric(20, 6))
     options: Mapped[list | None] = mapped_column(JSONB)  # для value_type = "enum"
     required: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    # Показывается ли поле в расчёте экономики (ТЗ 3.2.4). Позволяет форме
+    # подсветить параметры, от которых зависит итоговая цифра.
+    is_affecting_economics: Mapped[bool] = mapped_column(
+        Boolean, default=False, nullable=False
+    )
     is_demo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     order_index: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    # Пояснение для поля формы: что означает параметр и как его измерить
+    help_text: Mapped[str | None] = mapped_column(Text)
     # «Примечание / источник допущения» из демо-датасета
     note: Mapped[str | None] = mapped_column(Text)
     data_source_id: Mapped[int | None] = mapped_column(ForeignKey("data_sources.id", ondelete="SET NULL"))
@@ -134,10 +145,20 @@ class Normative(IntPrimaryKeyMixin, TimestampMixin, Base):
     value: Mapped[Decimal] = mapped_column(Numeric(20, 6), nullable=False)
     unit: Mapped[str | None] = mapped_column(String(64))
     category: Mapped[str] = mapped_column(String(64), default="общие", nullable=False)
+    # Допустимый диапазон правки. Без него администратор может задать
+    # отрицательную зарплату или нулевую производительность — и получить
+    # расчёт, который нельзя объяснить.
+    min_value: Mapped[Decimal | None] = mapped_column(Numeric(20, 6))
+    max_value: Mapped[Decimal | None] = mapped_column(Numeric(20, 6))
+    # number | integer | bool | text
+    value_type: Mapped[str] = mapped_column(String(32), default="number", nullable=False)
     source: Mapped[str | None] = mapped_column(Text)
     note: Mapped[str | None] = mapped_column(Text)
     model_version: Mapped[str] = mapped_column(String(32), default="econ-1.0.0", nullable=False)
     is_editable: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    # Растёт при каждой правке: снимки расчётов ссылаются на версию модели,
+    # и по ней видно, каким нормативом посчитаны сохранённые цифры.
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
     @property
     def as_float(self) -> float:

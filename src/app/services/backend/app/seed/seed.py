@@ -33,7 +33,7 @@ from app.models import (
     Vendor,
 )
 from app.models.project import Project, Scenario
-from app.seed.normatives_seed import NORMATIVES
+from app.seed.normatives_seed import NORMATIVES, NORMATIVE_RANGES
 from app.services.importers.catalog_csv import import_catalog
 from app.services.importers.catalog_taxonomy import PROCESSES
 from app.services.importers.object_params import import_object_parameters
@@ -49,8 +49,11 @@ CATALOG_FILE = "catalog_export_v4.csv"
 CATALOG_VERSION = "catalog-v4+ref-1.0"
 PARAMS_VERSION = "params-organizer-1.0"
 
-DEMO_ADMIN_EMAIL = "admin@demo.local"
-DEMO_USER_EMAIL = "user@demo.local"
+# Демонстрационные учётные записи живут на зарезервированном RFC 2606 домене
+# example.com: он гарантированно не принадлежит реальному владельцу, поэтому
+# письмо туда уйдёт в никуда, но адрес остаётся синтаксически валидным.
+DEMO_ADMIN_EMAIL = "admin@example.com"
+DEMO_USER_EMAIL = "user@example.com"
 DEMO_PASSWORD = "demo12345"
 
 
@@ -98,6 +101,7 @@ def _upsert_normatives(db: Session) -> int:
     existing = {n.code: n for n in db.scalars(select(Normative))}
     count = 0
     for defn in NORMATIVES:
+        low, high = NORMATIVE_RANGES.get(defn.code, (None, None))
         row = existing.get(defn.code)
         if row is None:
             db.add(
@@ -107,6 +111,8 @@ def _upsert_normatives(db: Session) -> int:
                     value=defn.value,
                     unit=defn.unit,
                     category=defn.category,
+                    min_value=low,
+                    max_value=high,
                     source=defn.source,
                     note=defn.note,
                     model_version=settings.calc_model_version,
@@ -118,6 +124,8 @@ def _upsert_normatives(db: Session) -> int:
             row.value = defn.value
             row.unit = defn.unit
             row.category = defn.category
+            row.min_value = low
+            row.max_value = high
             row.source = defn.source
             row.note = defn.note
             row.is_editable = defn.is_editable
@@ -293,6 +301,29 @@ def run_seed(db: Session, *, force: bool = False) -> SeedReport:
 
     db.commit()
     return report
+
+
+def is_seeded(db: Session) -> bool:
+    """Загружены ли данные организатора.
+
+    Проверяется не «есть ли хоть одна строка», а достаточно ли данных для
+    работы платформы. На Render базу удаляют примерно через месяц, поэтому
+    приложение при старте должно уверенно отличить «нужен импорт» от
+    «всё на месте» — по одной записи в справочнике это не сделать.
+    """
+    checks = {
+        "object_types": (ObjectType, 3),
+        "solution_types": (SolutionType, 10),
+        "processes": (Process, 15),
+        "parameters": (Parameter, 100),
+        "solutions": (Solution, 100),
+        "normatives": (Normative, 30),
+    }
+    for model, minimum in checks.values():
+        found = db.scalar(select(func.count()).select_from(model)) or 0
+        if found < minimum:
+            return False
+    return True
 
 
 def seed_summary(db: Session) -> dict:

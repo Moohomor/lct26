@@ -16,26 +16,69 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import AppError
 from app.models import Normative
+from app.seed.normatives_seed import SCENARIO_RANGES
 
-# Допущения, которые пользователь может переопределить в сценарии,
-# и нормативы, к которым их значения по умолчанию.
+def _range(normative_code: str, low: float, high: float) -> tuple[str, float, float]:
+    """Границы допущения берутся из словаря сценария, а не из диапазонов админки.
+
+    Для большинства параметров это один и тот же норматив, поэтому диапазоны
+    совпадают и берутся из одного места. Но множители (стоимость персонала,
+    оборудования, объём операций) двигаются в обе стороны — этого требует
+    анализ чувствительности (ТЗ 3.5.9), — и «× 0,7» не является опечаткой.
+    """
+    stored = SCENARIO_RANGES.get(normative_code)
+    if stored is not None:
+        return normative_code, float(stored[0]), float(stored[1])
+    return normative_code, low, high
+
+
+#: Множители варьируются в обе стороны относительно единицы.
+_MULTIPLIER_RANGE: tuple[float, float] = (0.5, 2.0)
+
 SCENARIO_OVERRIDABLE = {
-    # Множители варьируются в обе стороны: анализ чувствительности по ТЗ
-    # требует отклонения и вниз, и вверх от базового значения.
-    "labor_cost_multiplier": ("payroll.multiplier", 0.5, 2.0),
-    "equipment_cost_multiplier": (None, 0.5, 2.0),
-    "operations_multiplier": (None, 0.5, 2.0),
-    "horizon_years": ("calc.horizon_years", 1, 15),
-    "service_rate_pct": ("opex.service_pct", 0.0, 50.0),
-    "discount_rate": ("finance.discount_rate", 0.0, 1.0),
-    "raas_rate_pct": ("raas.rate_pct_of_capex_per_year", 5.0, 80.0),
-    "raas_term_months": ("raas.term_months", 1, 120),
-    "amortization_years": ("capex.amortization_years", 1, 15),
-    "lifetime_years": ("capex.solution_lifetime_years", 1, 20),
-    "battery_lifetime_years": ("capex.battery_lifetime_years", 1, 10),
-    "load_factor": ("sizing.load_factor", 0.3, 1.0),
-    "availability": ("sizing.availability", 0.5, 1.0),
+    "labor_cost_multiplier": _range("payroll.multiplier", *_MULTIPLIER_RANGE),
+    "equipment_cost_multiplier": ("", *_MULTIPLIER_RANGE),
+    "operations_multiplier": ("", *_MULTIPLIER_RANGE),
+    "horizon_years": _range("calc.horizon_years", 1, 15),
+    "service_rate_pct": _range("opex.service_pct", 0.0, 50.0),
+    "discount_rate": _range("finance.discount_rate", 0.0, 1.0),
+    "raas_rate_pct": _range("raas.rate_pct_of_capex_per_year", 5.0, 80.0),
+    "raas_term_months": _range("raas.term_months", 1, 120),
+    "amortization_years": _range("capex.amortization_years", 1, 15),
+    "lifetime_years": _range("capex.solution_lifetime_years", 1, 20),
+    "battery_lifetime_years": _range("capex.battery_lifetime_years", 1, 10),
+    "load_factor": _range("sizing.load_factor", 0.3, 1.0),
+    "availability": _range("sizing.availability", 0.5, 1.0),
 }
+
+
+def override_limits() -> dict[str, dict[str, Any]]:
+    """Переопределяемые допущения в виде, пригодном для интерфейса.
+
+    `SCENARIO_OVERRIDABLE` намеренно хранит позиционный кортеж: он участвует
+    в горячем пути проверки каждого переопределения. Для API он нечитаем —
+    кортеж нельзя ни развернуть в JSON как поля, ни сопоставить с кодом
+    норматива, по которому этот список и строится.
+    """
+    return {
+        code: {"normative": norm, "min": low, "max": high}
+        for code, (norm, low, high) in SCENARIO_OVERRIDABLE.items()
+    }
+
+
+def overrides_by_normative() -> dict[str, list[str]]:
+    """Норматив → коды его переопределений.
+
+    Списку допущений нужно знать, какие его строки пользователь вправе
+    изменить. Коды в двух словарях не совпадают по названию
+    (`payroll.multiplier` против `labor_cost_multiplier`), поэтому связь
+    строится явно, а не сравнением строк.
+    """
+    out: dict[str, list[str]] = {}
+    for code, (norm, _low, _high) in SCENARIO_OVERRIDABLE.items():
+        if norm:
+            out.setdefault(norm, []).append(code)
+    return {norm: sorted(codes) for norm, codes in out.items()}
 
 
 @dataclass

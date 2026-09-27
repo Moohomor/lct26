@@ -1,8 +1,8 @@
 """initial schema
 
-Revision ID: c05b1e62b197
+Revision ID: 33f3b72b2055
 Revises: 
-Create Date: 2026-09-27 13:49:02.899260
+Create Date: 2026-09-27 14:33:49.987254
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = 'c05b1e62b197'
+revision: str = '33f3b72b2055'
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -39,10 +39,14 @@ def upgrade() -> None:
     sa.Column('value', sa.Numeric(precision=20, scale=6), nullable=False),
     sa.Column('unit', sa.String(length=64), nullable=True),
     sa.Column('category', sa.String(length=64), nullable=False),
+    sa.Column('min_value', sa.Numeric(precision=20, scale=6), nullable=True),
+    sa.Column('max_value', sa.Numeric(precision=20, scale=6), nullable=True),
+    sa.Column('value_type', sa.String(length=32), nullable=False),
     sa.Column('source', sa.Text(), nullable=True),
     sa.Column('note', sa.Text(), nullable=True),
     sa.Column('model_version', sa.String(length=32), nullable=False),
     sa.Column('is_editable', sa.Boolean(), nullable=False),
+    sa.Column('version', sa.Integer(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('updated_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
@@ -94,7 +98,8 @@ def upgrade() -> None:
     sa.Column('action', sa.String(length=64), nullable=False),
     sa.Column('entity', sa.String(length=64), nullable=False),
     sa.Column('entity_id', sa.String(length=64), nullable=True),
-    sa.Column('payload', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('before', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+    sa.Column('after', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_audit_log_user_id_users'), ondelete='SET NULL'),
@@ -151,7 +156,10 @@ def upgrade() -> None:
     sa.Column('object_type_id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=255), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
+    sa.Column('organization', sa.String(length=255), nullable=True),
+    sa.Column('status', sa.String(length=32), nullable=False),
     sa.Column('parameters', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+    sa.Column('process_codes', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.Column('params_version', sa.String(length=32), nullable=True),
     sa.Column('is_demo', sa.Boolean(), nullable=False),
     sa.Column('source_file_name', sa.String(length=512), nullable=True),
@@ -164,6 +172,7 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id', name=op.f('pk_projects'))
     )
     op.create_index(op.f('ix_projects_object_type_id'), 'projects', ['object_type_id'], unique=False)
+    op.create_index(op.f('ix_projects_status'), 'projects', ['status'], unique=False)
     op.create_index(op.f('ix_projects_user_id'), 'projects', ['user_id'], unique=False)
     op.create_table('catalog_versions',
     sa.Column('version', sa.String(length=64), nullable=False),
@@ -189,10 +198,13 @@ def upgrade() -> None:
     sa.Column('default_text', sa.Text(), nullable=True),
     sa.Column('min_value', sa.Numeric(precision=20, scale=4), nullable=True),
     sa.Column('max_value', sa.Numeric(precision=20, scale=4), nullable=True),
+    sa.Column('step', sa.Numeric(precision=20, scale=6), nullable=True),
     sa.Column('options', postgresql.JSONB(astext_type=sa.Text()), nullable=True),
     sa.Column('required', sa.Boolean(), nullable=False),
+    sa.Column('is_affecting_economics', sa.Boolean(), nullable=False),
     sa.Column('is_demo', sa.Boolean(), nullable=False),
     sa.Column('order_index', sa.Integer(), nullable=False),
+    sa.Column('help_text', sa.Text(), nullable=True),
     sa.Column('note', sa.Text(), nullable=True),
     sa.Column('data_source_id', sa.Uuid(), nullable=True),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
@@ -241,18 +253,25 @@ def upgrade() -> None:
     op.create_index(op.f('ix_solution_types_process_id'), 'solution_types', ['process_id'], unique=False)
     op.create_table('calculations',
     sa.Column('scenario_id', sa.Integer(), nullable=False),
+    sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('kind', sa.String(length=32), nullable=False),
     sa.Column('model_version', sa.String(length=32), nullable=False),
     sa.Column('catalog_version', sa.String(length=64), nullable=True),
     sa.Column('params_version', sa.String(length=32), nullable=True),
+    sa.Column('capex_total', sa.Numeric(precision=16, scale=2), nullable=True),
+    sa.Column('annual_effect', sa.Numeric(precision=16, scale=2), nullable=True),
+    sa.Column('payback_years', sa.Numeric(precision=8, scale=2), nullable=True),
     sa.Column('input_snapshot', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.Column('result', postgresql.JSONB(astext_type=sa.Text()), nullable=False),
     sa.Column('duration_ms', sa.Integer(), nullable=True),
     sa.Column('computed_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['scenario_id'], ['scenarios.id'], name=op.f('fk_calculations_scenario_id_scenarios'), ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], name=op.f('fk_calculations_user_id_users'), ondelete='SET NULL'),
     sa.PrimaryKeyConstraint('id', name=op.f('pk_calculations'))
     )
     op.create_index(op.f('ix_calculations_scenario_id'), 'calculations', ['scenario_id'], unique=False)
+    op.create_index(op.f('ix_calculations_user_id'), 'calculations', ['user_id'], unique=False)
     op.create_table('simulation_runs',
     sa.Column('scenario_id', sa.Integer(), nullable=False),
     sa.Column('status', sa.String(length=32), nullable=False),
@@ -363,10 +382,13 @@ def upgrade() -> None:
     sa.Column('scenario_id', sa.Integer(), nullable=False),
     sa.Column('solution_id', sa.Uuid(), nullable=False),
     sa.Column('quantity', sa.Numeric(precision=10, scale=2), nullable=False),
-    sa.Column('id', sa.Uuid(), nullable=False),
+    sa.Column('is_locked', sa.Boolean(), nullable=False),
+    sa.Column('note', sa.Text(), nullable=True),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.ForeignKeyConstraint(['scenario_id'], ['scenarios.id'], name=op.f('fk_scenario_solutions_scenario_id_scenarios'), ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['solution_id'], ['solutions.id'], name=op.f('fk_scenario_solutions_solution_id_solutions'), ondelete='CASCADE'),
-    sa.PrimaryKeyConstraint('id', name=op.f('pk_scenario_solutions'))
+    sa.PrimaryKeyConstraint('id', name=op.f('pk_scenario_solutions')),
+    sa.UniqueConstraint('scenario_id', 'solution_id', name='uq_scenario_solution')
     )
     op.create_index(op.f('ix_scenario_solutions_scenario_id'), 'scenario_solutions', ['scenario_id'], unique=False)
     # ### end Alembic commands ###
@@ -387,6 +409,7 @@ def downgrade() -> None:
     op.drop_table('solutions')
     op.drop_index(op.f('ix_simulation_runs_scenario_id'), table_name='simulation_runs')
     op.drop_table('simulation_runs')
+    op.drop_index(op.f('ix_calculations_user_id'), table_name='calculations')
     op.drop_index(op.f('ix_calculations_scenario_id'), table_name='calculations')
     op.drop_table('calculations')
     op.drop_index(op.f('ix_solution_types_process_id'), table_name='solution_types')
@@ -398,6 +421,7 @@ def downgrade() -> None:
     op.drop_table('parameters')
     op.drop_table('catalog_versions')
     op.drop_index(op.f('ix_projects_user_id'), table_name='projects')
+    op.drop_index(op.f('ix_projects_status'), table_name='projects')
     op.drop_index(op.f('ix_projects_object_type_id'), table_name='projects')
     op.drop_table('projects')
     op.drop_index(op.f('ix_processes_object_type_id'), table_name='processes')

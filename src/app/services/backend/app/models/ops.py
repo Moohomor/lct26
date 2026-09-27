@@ -64,7 +64,11 @@ class AuditLog(IntPrimaryKeyMixin, Base):
     action: Mapped[str] = mapped_column(String(64), nullable=False)
     entity: Mapped[str] = mapped_column(String(64), nullable=False)
     entity_id: Mapped[str | None] = mapped_column(String(64))
-    payload: Mapped[dict | None] = mapped_column(JSONB)
+    # Состояние до и после правки. Хранится раздельно, а не одним блобом:
+    # по журналу должно быть видно, чем именно было заменено, без разбора
+    # структуры payload.
+    before: Mapped[dict | None] = mapped_column(JSONB)
+    after: Mapped[dict | None] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )

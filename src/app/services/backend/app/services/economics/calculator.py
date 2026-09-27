@@ -92,47 +92,73 @@ def _econ_num(value: Any) -> float:
         return 0.0
 
 
+def auto_quantity(
+    sol: Solution,
+    assumptions: Assumptions,
+    object_type: str,
+    process_codes: list[str],
+    params: dict,
+) -> tuple[int, Any | None]:
+    """Количество единиц по sizing и сам расчёт для показа пользователю.
+
+    Считается максимум по процессам, к которым решение применимо: иначе
+    робот окажется недозагруженным в пиковом процессе. Если производительность
+    неизвестна, sizing невозможен — тогда возвращается 1 и `None`, а
+    потребитель решает, что делать с такой позицией.
+    """
+    best: Any | None = None
+    for process_code in sol.process_codes or []:
+        if process_codes and process_code not in process_codes:
+            continue
+        _reqs, demand, _unit = build_requirements(object_type, process_code, params)
+        if not demand or demand <= 0:
+            continue
+        thr = _econ_num(sol.throughput_per_hour)
+        if thr <= 0:
+            continue
+        candidate = size(
+            peak_demand=demand,
+            unit_productivity=thr,
+            load_factor=assumptions.float_("sizing.load_factor"),
+            availability=assumptions.float_("sizing.availability"),
+        )
+        if best is None or candidate.units > best.units:
+            best = candidate
+    if best is None:
+        return 1, None
+    return max(1, int(best.units)), best
+
+
 def _build_lines(
     solutions: list[Solution],
-    quantities: dict[uuid.UUID, int],
+    quantities: dict[uuid.UUID, int | None],
     assumptions: Assumptions,
     object_type: str,
     process_codes: list[str],
     params: dict,
     equipment_cost_multiplier: float = 1.0,
 ) -> list[econ.EquipmentLine]:
+    """Собирает позиции расчёта.
+
+    `quantities[solution_id] = None` означает «количество не задано руками»:
+    тогда его определяет sizing. Явное число пользователя не пересчитывается.
+    """
     payroll = assumptions.float_("payroll.multiplier")
     fte_per_robot = assumptions.float_("effect.headcount_fte_per_robot")
 
     lines: list[econ.EquipmentLine] = []
     for sol in solutions:
-        quantity = max(1, int(quantities.get(sol.id, 1)))
+        explicit = quantities.get(sol.id)
+        sizing, sizing_result = auto_quantity(
+            sol, assumptions, object_type, process_codes, params
+        )
+        if explicit is None:
+            quantity = sizing
+        else:
+            quantity = max(1, int(explicit))
+
         price, price_source = _resolve_price(sol, assumptions)
         price *= equipment_cost_multiplier
-
-        sizing = None
-        # Sizing считаем по каждому процессу, к которому решение применимо,
-        # и берём максимум — иначе робот может оказаться недозагруженным
-        # в пиковый процесс.
-        for process_code in sol.process_codes or []:
-            if process_codes and process_code not in process_codes:
-                continue
-            _reqs, demand, unit = build_requirements(object_type, process_code, params)
-            if not demand or demand <= 0:
-                continue
-            thr = _econ_num(sol.throughput_per_hour)
-            if thr <= 0:
-                continue
-            candidate = size(
-                peak_demand=demand,
-                unit_productivity=thr,
-                load_factor=assumptions.float_("sizing.load_factor"),
-                availability=assumptions.float_("sizing.availability"),
-            )
-            if sizing is None or candidate.units > sizing.units:
-                sizing = candidate
-        if sizing is None:
-            quantity = quantity  # явное количество из сценария остаётся как есть
 
         labor_detail: dict[str, Any] = {}
         for process_code in sol.process_codes or []:
@@ -156,11 +182,15 @@ def _build_lines(
             quantity=quantity,
             unit_price=price,
             price_source=price_source,
-            sizing=sizing,
+            sizing=sizing_result,
             labor=labor_detail,
         )
         if price_source == "estimate":
             line.warnings.append("Цена рассчитана по нормативной оценке, не по каталогу.")
+        if explicit is not None and explicit != quantity:
+            line.warnings.append(
+                f"Количество задано вручную ({explicit}), расчёт по sizing дал {quantity}."
+            )
         lines.append(line)
     return lines
 
