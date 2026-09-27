@@ -12,6 +12,6 @@ export function useAPI<T> (
 ) {
   return useFetch<T, FetchError<CustomError>>(url, {
     ...options,
-    $fetch: useNuxtApp().$api
+    $fetch: useNuxtApp().fetchApi
   })
 }

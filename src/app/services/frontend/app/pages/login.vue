@@ -8,6 +8,29 @@ const router = useRouter();
 const registerTo = () => {
     router.push('/register')
 }
+
+// ── Вход ────────────────────────────────────────────────────────────────────
+const email = ref('')
+const password = ref('')
+const showPassword = ref(false)
+const loading = ref(false)
+const error = ref('')
+
+const authStore = useAuthStore()
+
+async function submit() {
+  error.value = ''
+  loading.value = true
+  try {
+    await authStore.login(email.value, password.value)
+    router.push('/')
+  } catch (e: any) {
+    // Бэкенд отдаёт {code, message, hint} — показываем сообщение и подсказку
+    error.value = e?.data?.message ?? e?.message ?? 'Не удалось войти'
+  } finally {
+    loading.value = false
+  }
+}
 </script>
 
 <template>
@@ -22,7 +45,7 @@ const registerTo = () => {
             <div class="jsx-6ce8f1f93781e4d3 rg-card-head"><h2 class="jsx-6ce8f1f93781e4d3 rg-card-title">Вход в
                 аккаунт</h2>
                 <p class="jsx-6ce8f1f93781e4d3 rg-card-sub">Войдите, чтобы продолжить работу на платформе</p></div>
-            <form novalidate="" class="jsx-6ce8f1f93781e4d3 rg-form">
+            <form @submit.prevent="submit" class="jsx-6ce8f1f93781e4d3 rg-form">
                 <div class="jsx-6ce8f1f93781e4d3 rg-field">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -30,7 +53,7 @@ const registerTo = () => {
                         <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                         <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                     </svg>
-                    <input placeholder="E-mail" autocomplete="email" required="" class="jsx-6ce8f1f93781e4d3 rg-input"
+                    <input v-model="email" placeholder="E-mail" autocomplete="email" required class="jsx-6ce8f1f93781e4d3 rg-input"
                            type="email"></div>
                 <div class="jsx-6ce8f1f93781e4d3 rg-field">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
@@ -39,9 +62,9 @@ const registerTo = () => {
                         <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
                         <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                     </svg>
-                    <input placeholder="Пароль" autocomplete="current-password" required=""
-                           class="jsx-6ce8f1f93781e4d3 rg-input rg-input--pw" type="password" value="">
-                    <button type="button" aria-label="Показать пароль" class="jsx-6ce8f1f93781e4d3 rg-eye">
+                    <input v-model="password" placeholder="Пароль" autocomplete="current-password" required
+                           class="jsx-6ce8f1f93781e4d3 rg-input rg-input--pw" :type="showPassword ? 'text' : 'password'">
+                    <button type="button" aria-label="Показать пароль" class="jsx-6ce8f1f93781e4d3 rg-eye" @click="showPassword = !showPassword">
                         <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
                              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                              class="lucide lucide-eye">
@@ -50,7 +73,10 @@ const registerTo = () => {
                         </svg>
                     </button>
                 </div>
-                <button type="submit" style="margin-top: 8px;" class="jsx-6ce8f1f93781e4d3 rg-submit">Войти</button>
+                <p v-if="error" style="color: #dc2626; font-size: 0.875rem; margin: 0 0 8px;">{{ error }}</p>
+                <button type="submit" :disabled="loading" style="margin-top: 8px;" class="jsx-6ce8f1f93781e4d3 rg-submit">
+                    {{ loading ? 'Вход...' : 'Войти' }}
+                </button>
                 <p class="jsx-6ce8f1f93781e4d3 rg-switch">Нет аккаунта?
                     <button @click="registerTo" type="button" class="jsx-6ce8f1f93781e4d3 rg-switch-btn">Зарегистрироваться</button>
                 </p>
