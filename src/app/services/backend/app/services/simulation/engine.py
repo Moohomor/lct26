@@ -66,6 +66,32 @@ class SimulationOutcome:
     notes: list[str] = field(default_factory=list)
 
 
+def scenario_robots(scenario: Any) -> list[dict[str, Any]]:
+    """Состав сценария в виде, который понимает движок имитации.
+
+    Живёт здесь, а не в роутере, потому что список единиц техники нужен и
+    пользователю (кнопка «смоделировать»), и генератору демо-проектов. Две
+    копии этого списка разошлись бы при первом же изменении полей каталога.
+    """
+    robots: list[dict[str, Any]] = []
+    for line in getattr(scenario, "solutions", ()):
+        sol = getattr(line, "solution", None)
+        if sol is None or float(line.quantity or 0) <= 0:
+            continue
+        robots.append(
+            {
+                "solution_id": str(sol.id),
+                "quantity": int(line.quantity),
+                "name": sol.name,
+                "type_code": sol.solution_type.code if sol.solution_type else None,
+                "throughput_per_hour": _opt_float(sol.throughput_per_hour),
+                "autonomy_hours": _opt_float(sol.autonomy_hours),
+                "battery_capacity_kwh": _opt_float(sol.battery_capacity_kwh),
+            }
+        )
+    return robots
+
+
 def _floor_size(object_type: str, params: dict[str, Any]) -> tuple[float, float]:
     """Габариты полотна из параметров объекта, с запасным вариантом."""
     length = _num(params, "floor_length_m") or _num(params, "length_m") or _num(params, "area_length_m")
@@ -78,6 +104,11 @@ def _floor_size(object_type: str, params: dict[str, Any]) -> tuple[float, float]
         length = math.sqrt(area * ratio[0] / ratio[1])
         return length, length * ratio[1] / ratio[0]
     return DEFAULT_FLOOR.get(object_type, (60.0, 40.0))
+
+
+def _opt_float(value: Any) -> float | None:
+    """Decimal/None из колонки каталога → float/None для расчёта."""
+    return float(value) if value is not None else None
 
 
 def _num(params: dict[str, Any], code: str) -> float | None:

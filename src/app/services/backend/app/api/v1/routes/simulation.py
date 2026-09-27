@@ -20,7 +20,7 @@ from app.core.deps import DbSession, LoggedIn, ensure_owner_or_admin
 from app.core.errors import AppError
 from app.models import Calculation, Project, Scenario, ScenarioSolution, Solution
 from app.schemas.api import SimulationOut, SimulationRequest
-from app.services.simulation.engine import simulate_scenario
+from app.services.simulation.engine import scenario_robots, simulate_scenario
 
 router = APIRouter(tags=["Имитация"])
 
@@ -60,10 +60,6 @@ def _serialize(run: Any) -> dict[str, Any]:
     }
 
 
-def _f(value: Any) -> float | None:
-    return float(value) if value is not None else None
-
-
 @router.post(
     "/scenarios/{scenario_id}/simulate",
     response_model=SimulationOut,
@@ -98,22 +94,7 @@ def simulate(
     assumptions = load_assumptions(db, settings.calc_model_version)
     apply_overrides(assumptions, scenario.assumptions or {})
 
-    robots = []
-    for line in scenario.solutions:
-        if float(line.quantity) <= 0 or line.solution is None:
-            continue
-        sol = line.solution
-        robots.append(
-            {
-                "solution_id": str(sol.id),
-                "quantity": int(line.quantity),
-                "name": sol.name,
-                "type_code": sol.solution_type.code if sol.solution_type else None,
-                "throughput_per_hour": _f(sol.throughput_per_hour),
-                "autonomy_hours": _f(sol.autonomy_hours),
-                "battery_capacity_kwh": _f(sol.battery_capacity_kwh),
-            }
-        )
+    robots = scenario_robots(scenario)
 
     started = datetime.now(UTC)
     try:

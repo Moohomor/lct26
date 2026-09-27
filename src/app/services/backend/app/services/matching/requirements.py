@@ -83,7 +83,21 @@ def _fmt(value: float | None, digits: int = 2) -> str:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-def _requirement_payload(params: dict, needed_kg: float | None, source: str, label: str) -> Requirement | None:
+def _requirement_payload(
+    params: dict,
+    needed_kg: float | None,
+    source: str,
+    label: str,
+    text: str | None = None,
+) -> Requirement | None:
+    """Требование по грузоподъёмности.
+
+    `text` передаётся аргументом, а не присваивается потом: Requirement —
+    неизменяемый dataclass, и попытка дописать в него подпись в вызывающем
+    коде падает на FrozenInstanceError. Текст требования различается от
+    процесса к процессу («грузоподъёмность», «буксируемая масса», «норма
+    партии»), поэтому лишний аргумент честнее, чем копия конструктора.
+    """
     if needed_kg is None or needed_kg <= 0:
         return None
     return Requirement(
@@ -93,7 +107,7 @@ def _requirement_payload(params: dict, needed_kg: float | None, source: str, lab
         minimum=needed_kg,
         unit="кг",
         source_param=source,
-        text=f"Грузоподъёмность не менее {_fmt(needed_kg, 0)} кг",
+        text=text or f"Грузоподъёмность не менее {_fmt(needed_kg, 0)} кг",
     )
 
 
@@ -312,26 +326,31 @@ def airport_requirements(object_type: str, process_code: str, params: dict) -> l
         unit_weight = _num(params, "baggage_weight_kg")
         if unit_weight:
             req = _requirement_payload(
-                params, unit_weight * 20, "baggage_weight_kg", "Грузоподъёмность (партия багажа)"
-            )
-            if req:
-                req.text = (
+                params,
+                unit_weight * 20,
+                "baggage_weight_kg",
+                "Грузоподъёмность (партия багажа)",
+                text=(
                     f"Грузоподъёмность не менее {_fmt(unit_weight * 20, 0)} кг "
                     f"(20 единиц багажа по {_fmt(unit_weight, 1)} кг)"
-                )
+                ),
+            )
+            if req:
                 reqs.append(req)
     elif process_code == "ground_handling":
         unit_weight = _num(params, "baggage_weight_kg")
         if unit_weight:
             req = _requirement_payload(
-                params, unit_weight * 20, "baggage_weight_kg", "Тяговые возможности"
-            )
-            if req:
-                req.label = "Буксируемая масса"
-                req.text = (
+                params,
+                unit_weight * 20,
+                "baggage_weight_kg",
+                "Буксируемая масса",
+                text=(
                     "Решение должно буксировать тележки с партией багажа "
                     f"(не менее {_fmt(unit_weight * 20, 0)} кг)"
-                )
+                ),
+            )
+            if req:
                 reqs.append(req)
     elif process_code == "ground_cleaning":
         noise = _requirement_noise(params)
@@ -340,12 +359,17 @@ def airport_requirements(object_type: str, process_code: str, params: dict) -> l
     elif process_code in {"catering", "terminal_logistics"}:
         meals = _num(params, "onboard_meals_day")
         if meals:
-            req = _requirement_payload(params, meals / 200, "onboard_meals_day", "Грузоподъёмность (норма партии)")
-            if req:
-                req.text = (
+            req = _requirement_payload(
+                params,
+                meals / 200,
+                "onboard_meals_day",
+                "Грузоподъёмность (норма партии)",
+                text=(
                     f"Норма парции — {_fmt(meals / 200, 0)} порций на рейс "
                     f"({_fmt(meals, 0)} порций в сутки)"
-                )
+                ),
+            )
+            if req:
                 reqs.append(req)
 
     temp = _requirement_temp(params)
@@ -452,19 +476,23 @@ def medical_requirements(object_type: str, process_code: str, params: dict) -> l
             reqs.append(req)
     elif process_code == "waste":
         req = _requirement_payload(
-            params, _num(params, "waste_b_kg_day"), "waste_b_kg_day", "Грузоподъёмность (контейнер с отходами)"
-        )
-        if req:
-            req.text = (
+            params,
+            _num(params, "waste_b_kg_day"),
+            "waste_b_kg_day",
+            "Грузоподъёмность (контейнер с отходами)",
+            text=(
                 "Контейнер с отходами класса Б тяжёлый: требуется решение "
                 "с достаточной грузоподъёмностью и герметичным баком"
-            )
+            ),
+        )
+        if req:
             reqs.append(req)
 
     corridor = _requirement_passage(params, "corridor_width_m", 0.2)
     if corridor:
-        # В больнице критичнее всего: нельзя застрять в коридоре.
-        corridor.severity = "blocker"
+        # В больнице критичнее всего: нельзя застрять в коридоре. Жёсткость
+        # требования задаёт фабрика — переопределять её после создания нельзя,
+        # да и не нужно.
         reqs.append(corridor)
 
     noise = _requirement_noise(params)
