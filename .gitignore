@@ -21,3 +21,6 @@ grafana/
 !grafana/Dockerfile
 grafana/data/
 grafana/provisioning/
+
+# Локальные заметки serena
+.serena/
