@@ -11,6 +11,7 @@ from app.api.v1.routes import (
     auth,
     catalog,
     economics,
+    export,
     matching,
     projects,
     reference,
@@ -26,4 +27,5 @@ api_router.include_router(projects.router)
 api_router.include_router(matching.router)
 api_router.include_router(economics.router)
 api_router.include_router(simulation.router)
+api_router.include_router(export.router)
 api_router.include_router(admin.router)
