@@ -152,6 +152,25 @@ Running upgrade  -> 33f3b72b2055, initial schema     ← миграции про
 подхватился — проверьте, что `app/seed/data/Датасеты_хакатон.xlsx` попал в образ
 (в `.dockerignore` он не исключён).
 
+### После создания сервисов вручную
+
+Если сервисы созданы не через Blueprint, а по отдельности, проверьте руками то,
+что в манифесте задаётся автоматически:
+
+| Параметр | Значение |
+|---|---|
+| `api` → Health Check Path | `/health` |
+| `grafana` → Health Check Path | `/api/health` |
+| `api` → Start Command | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
+| `api` → Environment | `DATABASE_URL`, `SECRET_KEY`, `FRONTEND_ORIGINS` |
+| статика → Environment | `NUXT_PUBLIC_API_BASE=https://<slug-бэкенда>.onrender.com` |
+| все три → репозиторий | GitHub, ветка `main` |
+
+Про образ Python: `ARG PYTHON_IMAGE` в [Dockerfile](./Dockerfile) переопределяется
+через **Build Arguments** (Render → Environment → Build Arguments), а не через
+Environment Variables. Если в Environment Variables лежит `PYTHON_IMAGE`, на
+сборку оно не влияет и используется значение по умолчанию из Dockerfile.
+
 ### Ограничения бесплатного плана
 
 - Free-веб-сервисы засыпают после ~15 минут простоя, следующий запрос
