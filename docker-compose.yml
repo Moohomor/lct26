@@ -7,9 +7,18 @@ services:
     volumes:
       - .:/app/
     working_dir: /app/src/app/services/backend/
-    links:
+    depends_on:
       - pgsql
-    command: fastapi run main.py --port 5000
+    # Точка входа — app.main:app. Корневой main.py был заглушкой с четырьмя
+    # тестовыми ручками; запускать нужно именно этот модуль.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 5000
+    environment:
+      # В контейнере api хост базы — имя сервиса, а не localhost.
+      POSTGRES_HOST: pgsql
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_DB: robotics
 
   pgsql:
     image: postgres:14
@@ -20,6 +29,9 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: 123456
+      # Без этого Postgres создаёт базу с именем пользователя ("root"),
+      # а приложение по умолчанию ждёт "robotics".
+      POSTGRES_DB: robotics
 
   nodejs:
     image: node:22-alpine

@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import pytest
+from sqlalchemy import select
 
 pytest.importorskip("sqlalchemy")
 
@@ -107,3 +108,48 @@ def test_param_codes_resolve_from_organizer_file():
             f"Псевдоним {aliases[0]!r} не резолвится в код {code}"
         )
         assert aliases, f"У кода {code} нет ни одного русского псевдонима"
+
+
+def test_dataset_file_is_present_and_readable():
+    """Книга организатора лежит в репозитории и читается.
+
+    Без файла приложение поднимается, но все справочники объектов пусты —
+    пользователь видит платформу без данных и без объяснения почему.
+    """
+    import openpyxl
+
+    from app.core.config import settings
+    from app.services.importers.object_params import SHEET_MAP
+    from app.seed.seed import CATASET_FILE
+
+    path = settings.seed_data_dir / CATASET_FILE
+    assert path.exists(), f"Нет файла {path} — параметры объектов не загрузятся"
+
+    workbook = openpyxl.load_workbook(path, data_only=True)
+    for sheet in SHEET_MAP:
+        assert sheet in workbook.sheetnames, (
+            f"В книге нет листа «{sheet}», ожидались: {list(SHEET_MAP)}"
+        )
+
+
+def test_dataset_matches_loaded_parameters(db_session):
+    """Число параметров в книге совпадает с числом в базе.
+
+    Это связывает два мира, которые иначе расходятся молча: файл, который
+    организаторы присылают, и то, что реально лежит в подборе и расчёте.
+    Подробное сравнение имён — `scripts/import_dataset.py --check`.
+    """
+    from app.core.config import settings
+    from app.models import ObjectType
+    from app.seed.seed import CATASET_FILE
+    from scripts.import_dataset import read_workbook
+
+    sheets = read_workbook(settings.seed_data_dir / CATASET_FILE)
+    expected = sum(len(rows) for rows in sheets.values())
+
+    loaded = sum(len(ot.parameters) for ot in db_session.scalars(select(ObjectType)))
+    assert expected > 0, "Книга не дала ни одного параметра"
+    assert loaded == expected, (
+        f"В книге {expected} параметров, в базе {loaded}. "
+        "Запустите `python -m scripts.import_dataset --import`."
+    )

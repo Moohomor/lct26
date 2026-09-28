@@ -99,7 +99,8 @@ class Parameter(IntPrimaryKeyMixin, TimestampMixin, Base):
     # в интерфейсе: иначе у одного и того же параметра в двух экранах будут
     # разные шаги.
     step: Mapped[Decimal | None] = mapped_column(Numeric(20, 6))
-    options: Mapped[list | None] = mapped_column(JSONB)  # для value_type = "enum"
+    # Список строк — подсказки для value_type = "enum" (например, покрытие пола).
+    options: Mapped[list[str] | None] = mapped_column(JSONB)
     required: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     # Показывается ли поле в расчёте экономики (ТЗ 3.2.4). Позволяет форме
     # подсветить параметры, от которых зависит итоговая цифра.

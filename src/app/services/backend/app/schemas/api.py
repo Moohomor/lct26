@@ -144,7 +144,7 @@ class ParameterOut(ApiModel):
     min_value: Any | None = None
     max_value: Any | None = None
     step: Any | None = None
-    options: list[dict] | None = None
+    options: list[str] | None = None
     required: bool = False
     is_affecting_economics: bool = False
     is_demo: bool = True
@@ -515,7 +515,7 @@ class ParameterCreate(BaseModel):
     min_value: Any | None = None
     max_value: Any | None = None
     step: Any | None = None
-    options: list[dict] | None = None
+    options: list[str] | None = None
     required: bool = False
     is_affecting_economics: bool = False
     help_text: str | None = None
@@ -529,7 +529,7 @@ class ParameterUpdate(BaseModel):
     min_value: Any | None = None
     max_value: Any | None = None
     step: Any | None = None
-    options: list[dict] | None = None
+    options: list[str] | None = None
     required: bool | None = None
     is_affecting_economics: bool | None = None
     help_text: str | None = None

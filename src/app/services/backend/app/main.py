@@ -88,6 +88,11 @@ def _migrate() -> None:
         logger.warning("alembic.ini не найден — миграции пропущены")
         return
     cfg = Config(str(cfg_path))
+    # В alembic.ini script_location задан относительным путём, а alembic
+    # разрешает его от текущего каталога, а не от расположения ini. При запуске
+    # не из корня backend'а миграции молча падают с «Path doesn't exist: alembic»
+    # и схема остаётся в состоянии прошлого деплоя.
+    cfg.set_main_option("script_location", str(BACKEND_ROOT / "alembic"))
     cfg.set_main_option("sqlalchemy.url", settings.sqlalchemy_url)
     try:
         command.upgrade(cfg, "head")
@@ -96,7 +101,7 @@ def _migrate() -> None:
 
 
 def _seed_if_needed() -> None:
-    from app.seed.seed import is_seeded, run_seed
+    from app.seed.seed import is_seeded, run_seed, seed_summary
 
     db = SessionLocal()
     try:
@@ -104,8 +109,13 @@ def _seed_if_needed() -> None:
             logger.info("Данные организатора уже загружены — импорт пропущен")
             return
         logger.info("Загружаю данные организатора…")
-        result = run_seed(db)
-        logger.info("Импорт завершён: %s", result.get("summary"))
+        # run_seed возвращает dataclass SeedReport, у которого нет метода get().
+        # Сводку берём из seed_summary() — она читает те же таблицы, но после
+        # коммита и в том же виде, в каком её показывает админка.
+        report = run_seed(db)
+        for warning in report.warnings:
+            logger.warning("Импорт данных: %s", warning)
+        logger.info("Импорт завершён: %s", seed_summary(db))
     except Exception as exc:  # noqa: BLE001
         # Приложение должно подняться даже без данных: справочники при этом
         # пустые, но объяснение пользователю понятнее, чем 502.

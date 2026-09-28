@@ -7,6 +7,14 @@
 #
 # Документация: https://render.com/docs/blueprint-spec
 # Оригинальный compose-файл: docker-compose.yml
+#
+# ВАЖНО про переиспользование существующей базы. Блок `databases:` в конце
+# файла заставит Render СОЗДАТЬ новую базу. Если база `pgsql` уже есть и её
+# нужно сохранить (в ней пользователи, проекты и расчёты), то:
+#   1) удалите блок `databases:` целиком;
+#   2) в Environment у сервиса `api` задайте DATABASE_URL вручную —
+#      Dashboard → pgsql → Connection → Internal Database URL.
+# Переменная DATABASE_URL имеет приоритет над POSTGRES_* (см. app/core/config.py).
 
 services:
   # ─── api: FastAPI-бэкенд (объединяет compose-сервисы `api` + `pgsql`) ───
@@ -17,14 +25,38 @@ services:
     region: frankfurt
     dockerfilePath: ./Dockerfile
     dockerContext: .
-    healthCheckPath: /
+    # Точка входа дублирует CMD из Dockerfile: сервис не сломается, если
+    # start command переопределили вручную. Модуль — app.main (реальное
+    # приложение с /api/v1 на 61 ручку), а не корневой main.py.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
         fromDatabase:
           name: pgsql
           property: connectionString
+      # Без него JWT подписывается опубликованным значением по умолчанию
+      # «dev-secret-change-me-in-production».
+      - key: SECRET_KEY
+        generateValue: true
       # Дополнительные фронтенд-домены через запятую (можно оставить пустым)
       - key: FRONTEND_ORIGINS
+        sync: false
+
+  # ─── frontend: статическая сборка Nuxt (compose-сервис `nodejs`) ───
+  - type: web
+    name: robotics-analysis-platform
+    runtime: static
+    # Фронтенд лежит в подкаталоге, и package.json там же — без rootDir
+    # Render искал бы их в корне репозитория и не нашёл.
+    rootDir: src/app/services/frontend
+    buildCommand: npm ci && npm run generate
+    staticPublishPath: .output/public
+    # Nuxt 4 (ssr: false) собирает статику в .output/public, а не в dist.
+    envVars:
+      # Фронтенд должен знать адрес бэкенда. Nuxt читает переменные окружения
+      # только для ключей, объявленных в runtimeConfig (см. nuxt.config.ts).
+      - key: NUXT_PUBLIC_API_BASE
         sync: false
 
   # ─── grafana: дашборды (compose-сервис `grafana`) ───
@@ -47,6 +79,7 @@ services:
         value: Europe/Moscow
 
 # ─── pgsql: управляемая PostgreSQL вместо контейнера postgres:14 ───
+# См. предупреждение в шапке файла, если база уже создана.
 databases:
   - name: pgsql
     plan: free                        # free-база живёт ~30 дней, потом удаляется

@@ -21,4 +21,15 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   ssr: false,
 
+  // Nuxt читает переменные окружения только для ключей, объявленных здесь.
+  // Без этого блока NUXT_PUBLIC_API_BASE игнорировался бы, и задеплоенный
+  // фронтенд всегда ходил бы на http://localhost:5000.
+  runtimeConfig: {
+    public: {
+      // Локально адрес задаёт docker-compose (api слушает 5000),
+      // на Render — переменная NUXT_PUBLIC_API_BASE.
+      apiBase: 'http://localhost:5000',
+    },
+  },
+
 })
