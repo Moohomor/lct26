@@ -47,11 +47,12 @@ services:
   - type: web
     name: robotics-analysis-platform
     runtime: static
-    # Фронтенд лежит в подкаталоге, и package.json там же — без rootDir
-    # Render искал бы их в корне репозитория и не нашёл.
-    rootDir: src/app/services/frontend
-    buildCommand: npm ci && npm run generate
-    staticPublishPath: .output/public
+    # Фронтенд лежит в подкаталоге. Переходим в него прямо в buildCommand,
+    # а не через rootDir: так конфигурация одинаково работает и в Blueprint,
+    # и при создании сервиса через Render API, где rootDir недоступен.
+    buildCommand: cd src/app/services/frontend && npm ci && npm run generate
+    # Nuxt 4 (ssr: false) собирает статику в .output/public, а не в dist.
+    staticPublishPath: src/app/services/frontend/.output/public
     # Nuxt 4 (ssr: false) собирает статику в .output/public, а не в dist.
     envVars:
       # Фронтенд должен знать адрес бэкенда. Nuxt читает переменные окружения

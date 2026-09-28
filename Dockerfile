@@ -1,4 +1,12 @@
-FROM docker.m.daocloud.io/library/python:3.12
+# Образ Python задаётся аргументом сборки, потому что в некоторых сетях
+# Docker Hub недоступен и нужен зеркальный реестр. Значение по умолчанию
+# оставлено зеркальным; если Docker Hub у вас доступен, переопределите:
+#
+#   docker compose build --build-arg PYTHON_IMAGE=python:3.12 api
+#
+# На Render: Environment → Build Arguments → PYTHON_IMAGE=python:3.12
+ARG PYTHON_IMAGE=docker.m.daocloud.io/library/python:3.12
+FROM ${PYTHON_IMAGE}
 
 WORKDIR /app
 
