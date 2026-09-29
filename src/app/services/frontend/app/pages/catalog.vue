@@ -487,22 +487,17 @@ function vendorCount(s: Solution): string {
                     }
                 
 /* Добавлено к исходной вёрстке страницы. */
-/* Карточка целиком ведёт в карточку решения. position:relative нужен,
-чтобы ::after-перекрытие легло поверх содержимого, а не под ним. */
-.rmc-card {
-  position: relative;
-}
-
-.rmc-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-}
-
+/* Карточка целиком ведёт в карточку решения.
+Растянутая ссылка уже была в вёрстке: .rmc-stretch::after с inset:0
+растягивается по .rmc-card, у которого position:relative. Переопределять
+позиционирование самой ссылки нельзя — тогда её ::after начнёт считать
+опорным сам <a> и накроет только строку с названием, а не всю карточку. */
 .rmc-card .rmc-stretch {
-  position: relative;
-  z-index: 1;
+  position: static;
+}
+
+.rmc-card .rmc-stretch::after {
+  z-index: 2;
 }
 
 .rmc-visual--photo img {
