@@ -241,3 +241,129 @@ def test_calculation_is_persisted_with_versions(client, user_headers):
     assert body["result"]["purchase"]["capex"]["total"] == pytest.approx(
         calc["purchase"]["capex"]["total"]
     )
+
+
+def test_explanatory_text_agrees_with_numbers():
+    """Пояснения модели пишутся числами, а не служебными значениями.
+
+    Текст читает человек, и раньше он содержал «За 3 лет … на 993750.0 руб.»:
+    окончание не согласовано с числом, а дробь и разряды не отформатированы.
+    Проверяем сами помощники — дешевле, чем искать ошибку в каждой строке.
+    """
+    from app.services.economics import engine as econ
+
+    assert econ.years_phrase(1) == "1 год"
+    assert econ.years_phrase(2) == "2 года"
+    assert econ.years_phrase(5) == "5 лет"
+    assert econ.years_phrase(11) == "11 лет"
+    assert econ.years_phrase(21) == "21 год"
+    assert econ.years_phrase(24) == "24 года"
+
+    assert econ.rub_text(993_750.4) == "993\u00a0750"
+    assert econ.rub_text(0) == "0"
+    assert "." not in econ.rub_text(1_234_567.89)
+    assert "," not in econ.rub_text(1_234_567.89), "разряды разделяются неразрывным пробелом"
+
+    assert econ.plural(1, "позиции", "позициям", "позициям") == "1 позиции"
+    assert econ.plural(3, "позиции", "позициям", "позициям") == "3 позициям"
+    assert econ.plural(7, "позиции", "позициям", "позициям") == "7 позициям"
+
+
+def test_warnings_are_not_duplicated(client, user_headers):
+    """Одна и та же оговорка не попадает в список дважды.
+
+    Предупреждения по оборудованию собираются отдельно для покупки и RaaS
+    из одного состава, и в сумме каждое дублировалось: пользователь видел
+    одну и ту же строку дважды и принимал это за ошибку расчёта.
+    """
+    project = client.post(
+        "/api/v1/projects",
+        headers=user_headers,
+        json={"object_type": "warehouse", "name": "Тест оговорок",
+               "parameters": _warehouse_params(), "process_codes": ["intra_logistics"]},
+    ).json()
+    match = client.post(
+        f"/api/v1/projects/{project['id']}/match?limit=1", headers=user_headers
+    ).json()
+    assert match["added"]
+    solutions = client.get(
+        f"/api/v1/projects/{project['id']}/solutions", headers=user_headers
+    ).json()
+    scenario = client.post(
+        f"/api/v1/projects/{project['id']}/scenarios",
+        headers=user_headers,
+        json={
+            "name": "Покупка",
+            "kind": "purchase",
+            "items": [{"solution_id": solutions[0]["solution_id"], "quantity": 1}],
+        },
+    ).json()
+    calc = client.post(
+        f"/api/v1/scenarios/{scenario['id']}/calculate?persist=false",
+        headers=user_headers,
+    ).json()
+
+    warnings = calc["warnings"]
+    assert warnings, "расчёт без оговорок — неправдоподобно"
+    assert len(warnings) == len(set(warnings)), (
+        "повторяющиеся оговорки: "
+        + "; ".join(sorted({w for w in warnings if warnings.count(w) > 1}))
+    )
+
+
+def test_raas_terms_are_inside_the_scenario_block():
+    """Коммерческие условия RaaS лежат внутри блока сценария.
+
+    Интерфейс читает их по пути res.raas.raas: верхний уровень res.raas —
+    это расчёт по сценарию RaaS с теми же capex/opex, что и у покупки.
+    Если путь поменяется, на странице появятся пустые «—», поэтому
+    закрепляем форму тестом.
+    """
+    from sqlalchemy import select
+
+    from app.core.db import SessionLocal
+    from app.models import Solution
+    from app.services.economics import engine as econ
+    from app.services.economics.calculator import ScenarioInput, calculate
+
+    db = SessionLocal()
+    try:
+        solution = db.scalars(
+            select(Solution).where(Solution.unit_price_rub.isnot(None)).limit(1)
+        ).first()
+        if solution is None:
+            pytest.skip("в каталоге нет позиций с ценой")
+        result = calculate(
+            db,
+            ScenarioInput(
+                object_type="warehouse",
+                object_type_name="Склад",
+                process_codes=["intra_logistics"],
+                params=_warehouse_params(),
+                items=[(solution.id, 1)],
+                horizon_years=5,
+                kind=econ.KIND_PURCHASE,
+            ),
+            with_sensitivity=False,
+        )
+    finally:
+        db.close()
+
+    terms = result["raas"].get("raas")
+    assert terms, "условия RaaS должны быть внутри блока сценария"
+    for key in (
+        "annual_payment",
+        "setup_fee",
+        "term_months",
+        "min_availability",
+        "delta_vs_purchase",
+    ):
+        assert key in terms, f"в условиях RaaS нет {key}"
+    assert "annual_payment" not in result["raas"], (
+        "условия RaaS не должны лежать на верхнем уровне сценария: "
+        "там расчётные capex/opex, а не платёж по договору"
+    )
+    assert result["purchase"].get("raas") is None, (
+        "у сценария покупки условий RaaS быть не должно"
+    )
+

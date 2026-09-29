@@ -249,9 +249,9 @@ def _scenario_result(
 
     if kind == econ.KIND_RAAS:
         # В RaaS у заказчика нет основных средств, поэтому амортизация равна
-        # нулю, а окупаемость — от вводного платежа.
+        # нулю, а окупаемость — от вводного платежа. Денежный остаток за год
+        # считает payback_report: дублировать его здесь не нужно.
         payment = raas["annual_payment"] + raas["provider_opex"]
-        cash_net = effect.gross - payment
         payback_block = econ.payback_report(
             investment=investment,
             gross_annual=effect.gross,
@@ -431,14 +431,19 @@ def calculate(
 
         sens = econ.sensitivity(purchase, sensitivity_run)
 
-    warnings = purchase["warnings"] + raas["warnings"]
+    # Предупреждения по оборудованию собираются отдельно для покупки и
+    # RaaS из одного и того же состава, поэтому в сумме каждое повторялось
+    # дважды. Порядок сохраняем, повторы убираем: список показывается
+    # пользователю, и удвоенная строка выглядит как ошибка расчёта.
+    warnings = list(dict.fromkeys(purchase["warnings"] + (raas["warnings"] if raas else [])))
     warnings.append(
-        f"Расчёт по {len(payload.items)} позициям оборудования на горизонте {horizon} лет."
+        f"Расчёт по {econ.plural(len(payload.items), 'позиции', 'позициям', 'позициям')} "
+        f"оборудования на горизонте {econ.years_phrase(horizon)}."
     )
     if residual_labor > 0:
         warnings.append(
             f"Роботизация замещает не весь персонал: остаточные расходы на ФОТ "
-            f"{residual_labor:,.0f} руб/год учтены в сценариях покупки и RaaS.".replace(",", " ")
+            f"{econ.rub_text(residual_labor)} руб/год учтены в сценариях покупки и RaaS."
         )
 
     return {
@@ -542,7 +547,7 @@ def _build_tco(
         "saving_vs_purchase": saving,
         "note": (
             "Стоимость владения за "
-            f"{horizon} лет. Во всех сценариях учтён остаточный ФОТ: "
+            f"{econ.years_phrase(horizon)}. Во всех сценариях учтён остаточный ФОТ: "
             "автоматизация замещает часть сотрудников, но не весь штат."
         ),
     }

@@ -52,6 +52,38 @@ def _r(value: float, digits: int = 2) -> float:
     return round(value + 0.0, digits)
 
 
+def rub_text(value: float) -> str:
+    """Денежная сумма в виде текста.
+
+    Пояснения модели читает человек, а `_r` отдаёт float: в текст он
+    попадал как «993750.0», без разделителей разрядов. Разряды разделяем
+    неразрывным пробелом, как принято в русской типографике, чтобы число
+    не рвалось переносом строки.
+    """
+    return f"{round(value):,}".replace(",", "\u00a0")
+
+
+def plural(count: int, one: str, few: str, many: str) -> str:
+    """Согласует существительное с числом: 1 позиция, 2 позиции, 5 позиций."""
+    tail100 = count % 100
+    tail10 = count % 10
+    if 11 <= tail100 <= 14:
+        word = many
+    elif tail10 == 1:
+        word = one
+    elif 2 <= tail10 <= 4:
+        word = few
+    else:
+        word = many
+    return f"{count} {word}"
+
+
+def years_phrase(count: int) -> str:
+    """«1 год», «2 года», «5 лет» — с правильным окончанием."""
+    return plural(count, "год", "года", "лет")
+
+
+
 @dataclass
 class EquipmentLine:
     """Одна позиция оборудования в составе сценария."""
@@ -513,14 +545,15 @@ def build_raas(
     delta = purchase_3y - total_3y
 
     notes: list[str] = []
+    years = years_phrase(term_months // 12)
     if delta > 0:
         notes.append(
-            f"За {term_months // 12} лет RaaS дешевле покупки на {_r(delta, 0)} руб. "
+            f"За {years} RaaS дешевле покупки на {rub_text(delta)} руб. "
             "(включены сервис, ПО и замена АКБ)."
         )
     else:
         notes.append(
-            f"За {term_months // 12} лет покупка выгоднее RaaS на {_r(-delta, 0)} руб. — "
+            f"За {years} покупка выгоднее RaaS на {rub_text(-delta)} руб. — "
             "это ожидаемо: сервис и обновления входят в платёж."
         )
     notes.append(
