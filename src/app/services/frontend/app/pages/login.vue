@@ -18,6 +18,18 @@ const error = ref('')
 
 const authStore = useAuthStore()
 
+// Демо-доступ подставляется по кнопке, а не вставляется в поля заранее:
+// на демонстрации заполненные поля выглядят как готовый вход и мешают
+// объяснить, что страница рабочая.
+const DEMO_EMAIL = 'user@example.com'
+const DEMO_PASSWORD = 'demo12345'
+
+function fillDemo() {
+  email.value = DEMO_EMAIL
+  password.value = DEMO_PASSWORD
+  error.value = ''
+}
+
 async function submit() {
   error.value = ''
   loading.value = true
@@ -74,6 +86,16 @@ async function submit() {
                     </button>
                 </div>
                 <p v-if="error" style="color: #dc2626; font-size: 0.875rem; margin: 0 0 8px;">{{ error }}</p>
+                <!-- Демонстрационные учётные записи создаются при наполнении базы.
+                     Без подсказки посетитель демонстрации не сможет войти и увидеть
+                     расчёт экономики — а это основная часть платформы. -->
+                <div class="jsx-6ce8f1f93781e4d3 rg-demo">
+                    <span>Демо-доступ</span>
+                    <code>user@example.com</code>
+                    <code>demo12345</code>
+                    <button type="button" class="jsx-6ce8f1f93781e4d3 rg-demo-fill"
+                            @click="fillDemo">Подставить</button>
+                </div>
                 <button type="submit" :disabled="loading" style="margin-top: 8px;" class="jsx-6ce8f1f93781e4d3 rg-submit">
                     {{ loading ? 'Вход...' : 'Войти' }}
                 </button>
@@ -84,3 +106,48 @@ async function submit() {
         </div>
     </section>
 </template>
+
+<style scoped>
+.rg-demo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin: 4px 0 8px;
+    padding: 9px 11px;
+    border: 1px dashed rgba(30, 136, 255, .35);
+    border-radius: 10px;
+    background: rgba(30, 136, 255, .06);
+    font-size: 12px;
+}
+
+.rg-demo span {
+    color: #4c586a;
+}
+
+.rg-demo code {
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: #fff;
+    border: 1px solid #dce5f2;
+    color: #0b1626;
+    font-size: 11.5px;
+}
+
+.rg-demo-fill {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.rg-demo-fill:hover {
+    background: var(--accent);
+    color: #fff;
+}
+</style>

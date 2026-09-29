@@ -10,9 +10,10 @@ const loginTo = () => {
 }
 
 // ── Регистрация ────────────────────────────────────────────────────────────
-const fullName = ref('')
 const email = ref('')
-const phone = ref('')
+const fullName = ref('')
+const lastName = ref('')
+const organization = ref('')
 const password = ref('')
 const passwordRepeat = ref('')
 const agreed = ref(false)
@@ -41,9 +42,17 @@ async function submit() {
 
   loading.value = true
   try {
-    // Имя и фамилия склеиваются в full_name: бэкенд ждёт одно поле,
-    // а форма спрашивает два.
-    await authStore.register(email.value, password.value, fullName.value.trim(), undefined)
+    // Бэкенд ждёт одно поле full_name, а форма спрашивает имя и фамилию
+    // отдельно. Раньше оба поля были привязаны к fullName, и фамилия
+    // затирала имя: пользователь вводил «Иван», потом «Петров» — и в
+    // профиль попадал только «Петров».
+    const name = [fullName.value.trim(), lastName.value.trim()].filter(Boolean).join(' ')
+    await authStore.register(
+      email.value.trim(),
+      password.value,
+      name || undefined,
+      organization.value.trim() || undefined,
+    )
     router.push('/')
   } catch (e: any) {
     error.value = e?.data?.message ?? e?.message ?? 'Не удалось зарегистрироваться'
@@ -88,7 +97,7 @@ function togglePassword(which: 'password' | 'repeat') {
                             <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                             <circle cx="12" cy="7" r="4"></circle>
                         </svg>
-                        <input v-model="fullName" placeholder="Фамилия (необязательно)" autocomplete="family-name" class="jsx-6ce8f1f93781e4d3 rg-input"
+                        <input v-model="lastName" placeholder="Фамилия (необязательно)" autocomplete="family-name" class="jsx-6ce8f1f93781e4d3 rg-input"
                                type="text"></div>
                 </div>
                 <div class="jsx-6ce8f1f93781e4d3 rg-field">
@@ -103,11 +112,13 @@ function togglePassword(which: 'password' | 'repeat') {
                 <div class="jsx-6ce8f1f93781e4d3 rg-field">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                         class="lucide lucide-phone rg-field-icon">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                         class="lucide lucide-building rg-field-icon">
+                        <rect width="16" height="20" x="4" y="2" rx="2"></rect>
+                        <path d="M9 22v-4h6v4"></path>
+                        <path d="M8 6h.01M16 6h.01M8 10h.01M16 10h.01M8 14h.01M16 14h.01"></path>
                     </svg>
-                    <input v-model="phone" placeholder="Телефон  +7 (___) ___-__-__" autocomplete="tel"
-                           class="jsx-6ce8f1f93781e4d3 rg-input" type="tel"></div>
+                    <input v-model="organization" placeholder="Организация (необязательно)"
+                           autocomplete="organization" class="jsx-6ce8f1f93781e4d3 rg-input" type="text"></div>
                 <div class="jsx-6ce8f1f93781e4d3 rg-field">
                     <svg xmlns="http://www.w3.org/2000/svg" width="19" height="19" viewBox="0 0 24 24" fill="none"
                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
