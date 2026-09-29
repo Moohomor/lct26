@@ -4,6 +4,11 @@ useHead({ title: 'Карточка решения' })
 // Страница решения из /api/v1/catalog/{id}. Раньше в каталоге стояла
 // ссылка «#», поэтому посмотреть ТТХ и цену позиции было негде, хотя
 // бэкенд отдаёт 52 поля.
+//
+// Лежит рядом с index.vue, а не как pages/catalog.vue: одноимённый файл
+// Nuxt делает родителем вложенных страниц и требует от него <NuxtPage />.
+// Без него переход на /catalog/<id> давал пустую страницу — компонент не
+// монтировался, запрос к бэкенду не уходил, полоса загрузки висела.
 const route = useRoute()
 const id = computed(() => String(route.params.id ?? ''))
 
@@ -16,83 +21,152 @@ const STATUS_LABEL: Record<string, string> = {
   rnd: 'НИОКР',
 }
 
-const { data: item, error, pending } = await useAsyncData(
-  () => `solution-${id.value}`,
+const { data: raw, error, pending } = await useAsyncData(
+  'solution',
   () => $fetchApi(`/api/v1/catalog/${id.value}`),
+  { watch: [id] },
 )
 
+// В шаблон отдаются готовые поля, а не ref с приведением типа: каст
+// (item as any) в разметке лишний раз касается распаковки ref.
+type Solution = Record<string, any>
+
+const item = computed<Solution | null>(() => (raw.value as Solution) ?? null)
 const photo = computed(() => {
-  const url = (item.value as { photo_url?: string | null } | null)?.photo_url
+  const url = item.value?.photo_url
   if (!url) return null
   return url.startsWith('http') ? url : `${apiBase}${url}`
+})
+const tags = computed(() => {
+  const s = item.value
+  if (!s) return []
+  const out: Array<{ text: string; cls?: string }> = []
+  if (s.solution_type?.name) out.push({ text: s.solution_type.name })
+  if (s.industry) out.push({ text: s.industry })
+  if (s.region) out.push({ text: s.region })
+  if (s.status) {
+    out.push({ text: STATUS_LABEL[s.status] ?? s.status, cls: 'rpd-tag--status' })
+  }
+  if (s.trl) out.push({ text: `УГТ ${s.trl} из 9` })
+  return out
 })
 
 const money = (v: number | null | undefined) =>
   v === null || v === undefined
     ? null
     : new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(v) + ' ₽'
-
 const num = (v: number | null | undefined, digits = 1) =>
-  v === null || v === undefined ? null : new Intl.NumberFormat('ru-RU', { maximumFractionDigits: digits }).format(v)
-
-// ТТХ: подписи берём у модели, а не пишем здесь, чтобы переводчик
-// правил одно место.
-const SPEC_FIELDS: Array<[string, (v: any, s: any) => string | null]> = [
-  ['payload_kg', (v) => (v ? num(v, 0) + ' кг' : null), 'Грузоподъёмность'],
-  ['own_weight_kg', (v) => (v ? num(v, 0) + ' кг' : null), 'Масса'],
-  ['length_m', (v) => (v ? num(v, 2) + ' м' : null), 'Длина'],
-  ['width_m', (v) => (v ? num(v, 2) + ' м' : null), 'Ширина'],
-  ['height_m', (v) => (v ? num(v, 2) + ' м' : null), 'Высота'],
-  ['min_passage_width_m', (v) => (v ? num(v, 2) + ' м' : null), 'Мин. проезд'],
-  ['lift_height_m', (v) => (v ? num(v, 2) + ' м' : null), 'Высота подъёма'],
-  ['max_speed_mps', (v) => (v ? num(v, 2) + ' м/с' : null), 'Скорость'],
-  ['throughput', (v, s) => (v ? num(v, 0) + ' ' + (s.throughput_unit ?? '') : null), 'Производительность'],
-  ['autonomy_hours', (v) => (v ? num(v, 0) + ' ч' : null), 'Автономность'],
-  ['charge_time_min', (v) => (v ? num(v, 0) + ' мин' : null), 'Зарядка'],
-  ['positioning_accuracy_mm', (v) => (v ? num(v, 0) + ' мм' : null), 'Точность позиционирования'],
-  ['battery_capacity_kwh', (v) => (v ? num(v, 1) + ' кВт·ч' : null), 'Ёмкость АКБ'],
-  ['charge_power_kw', (v) => (v ? num(v, 1) + ' кВт' : null), 'Мощность зарядки'],
-  ['battery_lifetime_years', (v) => (v ? num(v, 0) + ' лет' : null), 'Ресурс АКБ'],
-  ['lifetime_years', (v) => (v ? num(v, 0) + ' лет' : null), 'Срок службы'],
-  ['min_temp_c', (v) => (v ? num(v, 0) + ' °C' : null), 'Мин. температура'],
-  ['max_temp_c', (v) => (v ? num(v, 0) + ' °C' : null), 'Макс. температура'],
-  ['max_noise_dba', (v) => (v ? num(v, 0) + ' дБА' : null), 'Шум'],
-  ['navigation_types', (v) => (Array.isArray(v) && v.length ? v.join(', ') : null), 'Навигация'],
-]
+  v === null || v === undefined
+    ? null
+    : new Intl.NumberFormat('ru-RU', { maximumFractionDigits: digits }).format(v)
 
 const specs = computed(() => {
-  const s = item.value as Record<string, any> | null
+  const s = item.value
   if (!s) return []
-  return SPEC_FIELDS.map(([key, fmt, label]) => {
-    const raw = key === 'throughput' ? s.throughput_per_hour : s[key]
-    return { label, value: raw != null ? fmt(raw, s) : null }
-  }).filter((x) => x.value)
+  const rows: Array<[string, string | null]> = [
+    ['Грузоподъёмность', s.payload_kg ? num(s.payload_kg, 0) + ' кг' : null],
+    ['Масса', s.own_weight_kg ? num(s.own_weight_kg, 0) + ' кг' : null],
+    ['Длина', s.length_m ? num(s.length_m, 2) + ' м' : null],
+    ['Ширина', s.width_m ? num(s.width_m, 2) + ' м' : null],
+    ['Высота', s.height_m ? num(s.height_m, 2) + ' м' : null],
+    ['Мин. проезд', s.min_passage_width_m ? num(s.min_passage_width_m, 2) + ' м' : null],
+    ['Высота подъёма', s.lift_height_m ? num(s.lift_height_m, 2) + ' м' : null],
+    ['Скорость', s.max_speed_mps ? num(s.max_speed_mps, 2) + ' м/с' : null],
+    [
+      'Производительность',
+      s.throughput_per_hour ? num(s.throughput_per_hour, 0) + ' ' + (s.throughput_unit ?? '') : null,
+    ],
+    ['Автономность', s.autonomy_hours ? num(s.autonomy_hours, 0) + ' ч' : null],
+    ['Зарядка', s.charge_time_min ? num(s.charge_time_min, 0) + ' мин' : null],
+    [
+      'Точность позиционирования',
+      s.positioning_accuracy_mm ? num(s.positioning_accuracy_mm, 0) + ' мм' : null,
+    ],
+    ['Ёмкость АКБ', s.battery_capacity_kwh ? num(s.battery_capacity_kwh, 1) + ' кВт·ч' : null],
+    ['Мощность зарядки', s.charge_power_kw ? num(s.charge_power_kw, 1) + ' кВт' : null],
+    ['Ресурс АКБ', s.battery_lifetime_years ? num(s.battery_lifetime_years, 0) + ' лет' : null],
+    ['Срок службы', s.lifetime_years ? num(s.lifetime_years, 0) + ' лет' : null],
+    ['Мин. температура', s.min_temp_c != null ? num(s.min_temp_c, 0) + ' °C' : null],
+    ['Макс. температура', s.max_temp_c != null ? num(s.max_temp_c, 0) + ' °C' : null],
+    ['Шум', s.max_noise_dba != null ? num(s.max_noise_dba, 0) + ' дБА' : null],
+    [
+      'Навигация',
+      Array.isArray(s.navigation_types) && s.navigation_types.length
+        ? s.navigation_types.join(', ')
+        : null,
+    ],
+  ]
+  return rows.filter((r) => r[1] !== null).map(([label, value]) => ({ label, value: value as string }))
 })
 
 const priceRows = computed(() => {
-  const s = item.value as Record<string, any> | null
+  const s = item.value
   if (!s) return []
   return [
     { label: 'Оборудование', value: money(s.unit_price_rub) },
     { label: 'Программное обеспечение', value: money(s.software_price_rub) },
     { label: 'Внедрение', value: money(s.implementation_price_rub) },
     { label: 'Инфраструктура', value: money(s.infrastructure_price_rub) },
-    { label: 'Сервис, % в год', value: s.service_rate_pct != null ? num(s.service_rate_pct, 1) + ' %' : null },
+    {
+      label: 'Сервис, % в год',
+      value: s.service_rate_pct != null ? num(s.service_rate_pct, 1) + ' %' : null,
+    },
   ].filter((r) => r.value)
 })
 
-const objectTypes = computed(() => {
-  const v = (item.value as Record<string, any> | null)?.applicable_object_types
+const objectTypes = computed<Array<string>>(() => {
+  const v = item.value?.applicable_object_types
   return Array.isArray(v) ? v : []
 })
+
+// applicable_object_types хранит коды (warehouse, airport), а читать их
+// пользователю неудобно: подставляем названия из справочника. Если кода в
+// справочнике нет, оставляем как есть — так видно, что данных не хватило,
+// вместо молчаливого пропуска.
+const objectTypeNames = useState<Record<string, string>>('object-type-names', () => ({}))
+onMounted(async () => {
+  if (Object.keys(objectTypeNames.value).length) return
+  try {
+    const list = await $fetchApi<any>('/api/v1/object-types')
+    const items = Array.isArray(list) ? list : (list?.items ?? [])
+    const map: Record<string, string> = {}
+    for (const o of items) if (o?.code) map[o.code] = o.name ?? o.code
+    objectTypeNames.value = map
+  } catch {
+    // Справочник недоступен — покажем коды, это лучше, чем ничего.
+  }
+})
+const objectTypeLabels = computed(() =>
+  objectTypes.value.map((code) => objectTypeNames.value[code] ?? code),
+)
+
+// Комплектации одной позиции. В списке каталога варианты скрыты, иначе
+// одна и та же техника занимала бы несколько строк подряд, — поэтому
+// различия видны только здесь.
+const variants = computed(() => {
+  const list = item.value?.variants
+  if (!Array.isArray(list)) return []
+  return list.map((v: any) => ({
+    id: v.id,
+    name: v.name,
+    label: v.variant_label || null,
+    price: money(v.unit_price_rub),
+  }))
+})
+const completeness = computed(() =>
+  item.value?.completeness != null ? num(item.value.completeness, 0) + '%' : null,
+)
+const price = computed(() => money(item.value?.unit_price_rub) ?? 'Цена по запросу')
 </script>
 
 <template>
     <div>
         <div class="rpd-root">
             <div class="rpd-shell">
-                <nav class="rpd-crumbs"><NuxtLink to="/catalog">Каталог роботов</NuxtLink> /
-                    <span>{{ (item as any)?.name ?? 'Решение' }}</span></nav>
+                <nav class="rpd-crumbs">
+                    <NuxtLink to="/catalog">Каталог роботов</NuxtLink>
+                    <span v-if="item"> / {{ item.name }}</span>
+                </nav>
 
                 <div v-if="pending" class="rpd-state">Загружаем карточку…</div>
 
@@ -104,34 +178,33 @@ const objectTypes = computed(() => {
                 <template v-else>
                     <header class="rpd-head">
                         <div class="rpd-visual">
-                            <img v-if="photo" :src="photo" :alt="(item as any).name">
+                            <img v-if="photo" :src="photo" :alt="item.name">
                             <div v-else class="rpd-visual--none">Нет фото</div>
                         </div>
+
                         <div class="rpd-title">
-                            <h1>{{ (item as any).name }}</h1>
-                            <p class="rpd-maker">{{ (item as any).vendor?.name ?? 'Производитель не указан' }}<span
-                                    v-if="(item as any).vendor?.country"> · {{ (item as any).vendor.country }}</span></p>
+                            <h1>{{ item.name }}</h1>
+                            <p class="rpd-maker">
+                                {{ item.vendor?.name ?? 'Производитель не указан' }}
+                                <span v-if="item.vendor?.country"> · {{ item.vendor.country }}</span>
+                            </p>
                             <div class="rpd-tags">
-                                <span class="rpd-tag" v-if="(item as any).solution_type">{{ (item as any).solution_type.name }}</span>
-                                <span class="rpd-tag" v-if="(item as any).industry">{{ (item as any).industry }}</span>
-                                <span class="rpd-tag" v-if="(item as any).region">{{ (item as any).region }}</span>
-                                <span class="rpd-tag rpd-tag--status">{{ STATUS_LABEL[(item as any).status] ?? (item as any).status }}</span>
-                                <span class="rpd-tag" v-if="(item as any).trl">УГТ {{ (item as any).trl }} из 9</span>
+                                <span v-for="t in tags" :key="t.text" class="rpd-tag" :class="t.cls">{{ t.text }}</span>
                             </div>
-                            <p class="rpd-purpose" v-if="(item as any).purpose">{{ (item as any).purpose }}</p>
-                            <p class="rpd-desc" v-if="(item as any).description">{{ (item as any).description }}</p>
+                            <p v-if="item.purpose" class="rpd-purpose">{{ item.purpose }}</p>
+                            <p v-if="item.description" class="rpd-desc">{{ item.description }}</p>
                         </div>
+
                         <div class="rpd-price">
-                            <div class="rpd-price__main">{{ money((item as any).unit_price_rub) ?? 'Цена по запросу' }}</div>
-                            <div class="rpd-price__src" v-if="(item as any).data_source">Источник:
-                                {{ (item as any).data_source.name }}</div>
-                            <div class="rpd-price__comp" v-if="(item as any).completeness">
-                                Заполнено ТТХ: {{ num((item as any).completeness, 0) }}%
+                            <div class="rpd-price__main">{{ price }}</div>
+                            <div v-if="item.data_source" class="rpd-price__src">
+                                Источник: {{ item.data_source.name }}
                             </div>
+                            <div v-if="completeness" class="rpd-price__comp">Заполнено ТТХ: {{ completeness }}</div>
                         </div>
                     </header>
 
-                    <section class="rpd-block" v-if="specs.length">
+                    <section v-if="specs.length" class="rpd-block">
                         <h2>Технические характеристики</h2>
                         <dl class="rpd-specs">
                             <div v-for="s in specs" :key="s.label" class="rpd-spec">
@@ -141,7 +214,7 @@ const objectTypes = computed(() => {
                         </dl>
                     </section>
 
-                    <section class="rpd-block" v-if="priceRows.length > 1">
+                    <section v-if="priceRows.length > 1" class="rpd-block">
                         <h2>Стоимость владения</h2>
                         <dl class="rpd-specs">
                             <div v-for="r in priceRows" :key="r.label" class="rpd-spec">
@@ -151,13 +224,25 @@ const objectTypes = computed(() => {
                         </dl>
                     </section>
 
-                    <section class="rpd-block" v-if="objectTypes.length || (item as any).infrastructure_requirements">
+                    <section v-if="variants.length" class="rpd-block">
+                        <h2>Комплектации</h2>
+                        <ul class="rpd-variants">
+                            <li v-for="v in variants" :key="v.id" class="rpd-variant">
+                                <span class="rpd-variant__name">
+                                    {{ v.name }}
+                                    <b v-if="v.label">{{ v.label }}</b>
+                                </span>
+                                <span class="rpd-variant__price">{{ v.price ?? 'Цена по запросу' }}</span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section v-if="objectTypes.length || item.infrastructure_requirements" class="rpd-block">
                         <h2>Условия применения</h2>
-                        <p v-if="objectTypes.length">Подходит для объектов:
-                            <b>{{ objectTypes.join(', ') }}</b>
+                        <p v-if="objectTypeLabels.length">
+                            Подходит для объектов: <b>{{ objectTypeLabels.join(', ') }}</b>
                         </p>
-                        <p v-if="(item as any).infrastructure_requirements">
-                            {{ (item as any).infrastructure_requirements }}</p>
+                        <p v-if="item.infrastructure_requirements">{{ item.infrastructure_requirements }}</p>
                     </section>
                 </template>
             </div>
@@ -195,6 +280,13 @@ const objectTypes = computed(() => {
 .rpd-spec { display: flex; justify-content: space-between; gap: 12px; border-bottom: 1px dashed #EDF1F7; padding-bottom: 6px; }
 .rpd-spec dt { color: #6B7A93; font-size: 13px; }
 .rpd-spec dd { margin: 0; font-size: 13px; font-weight: 600; }
+
+.rpd-variants { list-style: none; margin: 0; padding: 0; }
+.rpd-variant { display: flex; justify-content: space-between; gap: 14px; align-items: baseline;
+  border-bottom: 1px dashed #EDF1F7; padding-bottom: 6px; margin-bottom: 6px; font-size: 13px; }
+.rpd-variant:last-child { border-bottom: 0; margin-bottom: 0; }
+.rpd-variant__name b { margin-left: 6px; color: #0568FF; font-weight: 600; }
+.rpd-variant__price { white-space: nowrap; font-weight: 600; }
 
 .rpd-state { padding: 48px 20px; text-align: center; color: #6B7A93; }
 .rpd-btn { display: inline-block; margin-top: 10px; padding: 8px 14px; background: #0568FF; color: #fff; border-radius: 8px; text-decoration: none; }

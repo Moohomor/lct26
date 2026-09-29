@@ -331,7 +331,11 @@ def get_solution(solution_id: uuid.UUID, db: DbSession) -> dict[str, Any]:
             "id": v.id,
             "name": v.name,
             "variant_label": v.variant_label,
-            "unit_price_rub": _f(v.unit_price_rub),
+            # Колонка Numeric, а схема ждёт float — приводим так же, как
+            # в serialize_solution. Раньше здесь стоял несуществующий
+            # помощник _f: карточка падала с 500, но только у решений,
+            # у которых есть варианты комплектации, — список открывался.
+            "unit_price_rub": float(v.unit_price_rub) if v.unit_price_rub is not None else None,
         }
         for v in db.scalars(
             select(Solution)

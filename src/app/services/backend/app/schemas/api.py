@@ -224,6 +224,15 @@ class SolutionOut(ApiModel):
     photo_url: str | None = None
 
 
+class SolutionVariant(BaseModel):
+    """Комплектация одной позиции каталога."""
+
+    id: uuid.UUID
+    name: str
+    variant_label: str | None = None
+    unit_price_rub: float | None = None
+
+
 class SolutionDetail(SolutionOut):
     payload_kg: float | None
     own_weight_kg: float | None
@@ -252,6 +261,10 @@ class SolutionDetail(SolutionOut):
     service_rate_pct: float | None
     purchase_model: str
     raw: dict | None = None
+    # Комплектации той же позиции. Маршрут их собирает, но без этого поля
+    # схема ответа отбрасывала бы их, и различий между комплектациями
+    # не было бы видно нигде — ни в интерфейсе, ни у потребителя API.
+    variants: list[SolutionVariant] = Field(default_factory=list)
 
 
 class SolutionListResponse(BaseModel):

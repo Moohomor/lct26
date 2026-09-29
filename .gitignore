@@ -24,3 +24,8 @@ grafana/provisioning/
 
 # Локальные заметки serena
 .serena/
+
+# Node-зависимости. Каталог фронтенда игнорируется сам собой, а корневой
+# появляется после `npm i --no-save playwright-core` для scripts/browser_smoke.js
+node_modules/
+package-lock.json
