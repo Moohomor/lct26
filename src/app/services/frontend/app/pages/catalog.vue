@@ -113,17 +113,31 @@ function maker(s: Solution): string {
   return country ? `${name} · ${country}` : name
 }
 
-// Картинок у решений в базе нет, поэтому визуальный блок — инициалы типа.
-// Подставлять выдуманные фото значило бы выдавать чужую продукцию за
-// организаторскую.
-function initials(s: Solution): string {
-  const source = s.solution_type?.name ?? s.name
-  return source
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((w) => w[0] ?? '')
-    .join('')
-    .toUpperCase()
+// Фотографий решений в базе нет, и подставлять выдуманные или чужие снимки
+// значило бы выдавать чужую продукцию за организаторскую. Поэтому визуальный
+// блок — значок типа решения: он различает AMR, погрузчик и стеллаж между
+// собой, а инициалы вроде «ПР» или «F» не говорили ничего.
+// Настоящие снимки берутся из «Каталога внедрения» ФЦ БАС — см. TODO.
+const TYPE_ICONS: Record<string, string> = {
+  amr: '<circle cx="12" cy="12" r="3.2"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><circle cx="12" cy="12" r="8.5" stroke-dasharray="3 3"/>',
+  fmr: '<path d="M4 20V4M8 20V4"/><path d="M4 9h9"/><path d="M13 9v11M13 12h5a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-5z"/>',
+  stacker: '<rect x="3" y="13" width="18" height="3" rx="1"/><rect x="3" y="17" width="18" height="3" rx="1"/><path d="M12 3v7"/><path d="M8 6h8"/>',
+  tugger: '<path d="M3 16V8h9l3 3h6v5"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/><path d="M9.5 17.5h6"/>',
+  unmanned_forklift: '<path d="M4 19V5"/><path d="M4 11h10"/><rect x="14" y="8" width="7" height="8" rx="1.5"/><path d="M17.5 16v3"/>',
+  autonomous_truck: '<path d="M2 17V7h11l4 4h5v6"/><circle cx="6.5" cy="18.5" r="2"/><circle cx="17.5" cy="18.5" r="2"/><path d="M2 12h5"/>',
+  cleaner: '<path d="M9 3h6l1 4H8z"/><rect x="8" y="7" width="8" height="5" rx="1"/><path d="M10 12v2M14 12v2"/><circle cx="9" cy="17" r="1.6"/><circle cx="15" cy="18" r="1.3"/>',
+  asrs: '<rect x="2.5" y="2.5" width="8" height="8" rx="1"/><rect x="13.5" y="2.5" width="8" height="8" rx="1"/><rect x="2.5" y="13.5" width="8" height="8" rx="1"/><path d="M17.5 13.5v8M13.5 17.5h8"/>',
+  shuttle: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  sorter: '<path d="M3 4h18l-7 8v7l-4 2v-9z"/>',
+  inventory_robot: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M2 12h2M20 12h2"/>',
+  delivery_robot: '<path d="M5 8h9v8a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z"/><path d="M14 10h4l2 3v3h-6"/><circle cx="9" cy="20" r="1.6"/><circle cx="17" cy="20" r="1.6"/>',
+  manipulator: '<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/><path d="M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/>',
+  rpa_software: '<rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8 21h8M12 17v4"/><path d="M7 12l2.5-3 2 2 3-4"/>',
+  other: '<rect x="3" y="8" width="8" height="8" rx="1"/><rect x="13" y="8" width="8" height="8" rx="1"/><path d="M7 4v4M17 4v4"/>',
+}
+
+function typeIcon(s: Solution): string {
+  return TYPE_ICONS[s.solution_type?.code ?? 'other'] ?? TYPE_ICONS.other
 }
 
 function vendorCount(s: Solution): string {
@@ -225,7 +239,11 @@ function vendorCount(s: Solution): string {
                             <span class="rmc-badge" v-if="s.status !== 'operation'">{{
                                 STATUS_LABEL[s.status] ?? s.status
                             }}</span>
-                            <div class="rmc-visual rmc-visual--initials"><span>{{ initials(s) }}</span></div>
+                            <div class="rmc-visual rmc-visual--icon" role="img"
+                                 :aria-label="s.solution_type?.name ?? 'Решение'">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                     stroke-linecap="round" stroke-linejoin="round" v-html="typeIcon(s)"></svg>
+                            </div>
                             <div class="rmc-body">
                                 <h3><a class="rmc-stretch" href="#">{{ s.name }}</a></h3>
                                 <p class="rmc-maker">{{ maker(s) }}</p>
@@ -444,13 +462,18 @@ function vendorCount(s: Solution): string {
                     }
                 
 /* Добавлено к исходной вёрстке страницы. */
-.rmc-visual--initials {
+.rmc-visual--icon {
   display: grid;
   place-items: center;
-  font-weight: 700;
-  letter-spacing: .04em;
   color: #0568FF;
   background: linear-gradient(135deg, #EEF4FF 0%, #F7FAFF 100%);
+}
+
+.rmc-visual--icon svg {
+  width: 46%;
+  max-width: 78px;
+  height: auto;
+  opacity: .9;
 }
 
 .rmc-reset {
