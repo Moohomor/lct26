@@ -253,78 +253,79 @@ function vendorCount(s: Solution): string {
                         </button>
                         </section>
                         </div>
-                    </div>
+                        <div>
+                          <section class="rmc-grid" v-if="items.length">
+                              <article v-for="s in items" :key="s.id" class="rmc-card">
+                                  <span class="rmc-badge" v-if="s.status !== 'operation'">{{
+                                      STATUS_LABEL[s.status] ?? s.status
+                                  }}</span>
+                                  <div class="rmc-visual rmc-visual--photo" v-if="photo(s)">
+                                      <img :src="photo(s)!" :alt="s.name" loading="lazy" decoding="async"
+                                          @error="onPhotoError($event)">
+                                  </div>
+                                  <div class="rmc-visual rmc-visual--icon" v-else role="img"
+                                      :aria-label="s.solution_type?.name ?? 'Решение'">
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                                          stroke-linecap="round" stroke-linejoin="round" v-html="typeIcon(s)"></svg>
+                                  </div>
+                                  <div class="rmc-body">
+                                      <h3><NuxtLink class="rmc-stretch" :to="`/catalog/${s.id}`">{{ s.name }}</NuxtLink></h3>
+                                      <p class="rmc-maker">{{ maker(s) }}</p>
+                                      <p class="rmc-desc">{{ s.purpose || s.description || 'Назначение не указано' }}</p>
+                                      <div class="rmc-tags">
+                                          <span v-if="s.solution_type">{{ s.solution_type.name }}</span>
+                                          <span v-if="s.industry">{{ s.industry }}</span>
+                                          <span v-if="s.trl">УГТ {{ s.trl }}</span>
+                                      </div>
+                                      <div class="rmc-foot">
+                                          <div>
+                                              <div class="rmc-price">{{ price(s) }}</div>
+                                              <div class="rmc-sup">{{ vendorCount(s) }}</div>
+                                          </div>
+                                          <span class="rmc-go" aria-hidden="true"><svg
+                                                  xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                                  stroke-linecap="round" stroke-linejoin="round"
+                                                  class="lucide lucide-arrow-right"><path
+                                                  d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
+                                      </div>
+                                  </div>
+                              </article>
+                          </section>
 
-                    <section class="rmc-grid" v-if="items.length">
-                        <article v-for="s in items" :key="s.id" class="rmc-card">
-                            <span class="rmc-badge" v-if="s.status !== 'operation'">{{
-                                STATUS_LABEL[s.status] ?? s.status
-                            }}</span>
-                            <div class="rmc-visual rmc-visual--photo" v-if="photo(s)">
-                                <img :src="photo(s)!" :alt="s.name" loading="lazy" decoding="async"
-                                     @error="onPhotoError($event)">
-                            </div>
-                            <div class="rmc-visual rmc-visual--icon" v-else role="img"
-                                 :aria-label="s.solution_type?.name ?? 'Решение'">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
-                                     stroke-linecap="round" stroke-linejoin="round" v-html="typeIcon(s)"></svg>
-                            </div>
-                            <div class="rmc-body">
-                                <h3><NuxtLink class="rmc-stretch" :to="`/catalog/${s.id}`">{{ s.name }}</NuxtLink></h3>
-                                <p class="rmc-maker">{{ maker(s) }}</p>
-                                <p class="rmc-desc">{{ s.purpose || s.description || 'Назначение не указано' }}</p>
-                                <div class="rmc-tags">
-                                    <span v-if="s.solution_type">{{ s.solution_type.name }}</span>
-                                    <span v-if="s.industry">{{ s.industry }}</span>
-                                    <span v-if="s.trl">УГТ {{ s.trl }}</span>
-                                </div>
-                                <div class="rmc-foot">
-                                    <div>
-                                        <div class="rmc-price">{{ price(s) }}</div>
-                                        <div class="rmc-sup">{{ vendorCount(s) }}</div>
-                                    </div>
-                                    <span class="rmc-go" aria-hidden="true"><svg
-                                            xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            class="lucide lucide-arrow-right"><path
-                                            d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg></span>
-                                </div>
-                            </div>
-                        </article>
-                    </section>
+                          <div class="rmc-empty" v-else-if="pending">
+                              <p>Загружаем каталог…</p>
+                          </div>
+                          <div class="rmc-empty" v-else>
+                              <p>По этим условиям ничего не нашлось.</p>
+                              <button type="button" class="rmc-reset" @click="resetFilters">Сбросить фильтры</button>
+                          </div>
 
-                    <div class="rmc-empty" v-else-if="pending">
-                        <p>Загружаем каталог…</p>
+                          <nav class="rmc-pages" aria-label="Страницы каталога" v-if="pages > 1">
+                              <button type="button" aria-label="Предыдущая страница" :disabled="page <= 1" @click="page--">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                      stroke-linejoin="round" class="lucide lucide-chevron-left">
+                                      <path d="m15 18-6-6 6-6"></path>
+                                  </svg>
+                              </button>
+                              <button type="button" :class="{ 'rmc-page-active': page === 1 }" @click="page = 1">1</button>
+                              <button type="button" v-for="n in pages" :key="n" v-show="n > 1 && n < pages && Math.abs(n - page) <= 1"
+                                      :class="{ 'rmc-page-active': page === n }" @click="page = n">{{ n }}</button>
+                              <span class="rmc-gap" v-if="pages > 3">…</span>
+                              <button type="button" v-if="pages > 1" :class="{ 'rmc-page-active': page === pages }" @click="page = pages">
+                                  {{ pages }}
+                              </button>
+                              <button type="button" aria-label="Следующая страница" :disabled="page >= pages" @click="page++">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                      fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                      stroke-linejoin="round" class="lucide lucide-chevron-right">
+                                      <path d="m9 18 6-6-6-6"></path>
+                                  </svg>
+                              </button>
+                          </nav>
+                        </div>
                     </div>
-                    <div class="rmc-empty" v-else>
-                        <p>По этим условиям ничего не нашлось.</p>
-                        <button type="button" class="rmc-reset" @click="resetFilters">Сбросить фильтры</button>
-                    </div>
-
-                    <nav class="rmc-pages" aria-label="Страницы каталога" v-if="pages > 1">
-                        <button type="button" aria-label="Предыдущая страница" :disabled="page <= 1" @click="page--">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="lucide lucide-chevron-left">
-                                <path d="m15 18-6-6 6-6"></path>
-                            </svg>
-                        </button>
-                        <button type="button" :class="{ 'rmc-page-active': page === 1 }" @click="page = 1">1</button>
-                        <button type="button" v-for="n in pages" :key="n" v-show="n > 1 && n < pages && Math.abs(n - page) <= 1"
-                                :class="{ 'rmc-page-active': page === n }" @click="page = n">{{ n }}</button>
-                        <span class="rmc-gap" v-if="pages > 3">…</span>
-                        <button type="button" v-if="pages > 1" :class="{ 'rmc-page-active': page === pages }" @click="page = pages">
-                            {{ pages }}
-                        </button>
-                        <button type="button" aria-label="Следующая страница" :disabled="page >= pages" @click="page++">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                 stroke-linejoin="round" class="lucide lucide-chevron-right">
-                                <path d="m9 18 6-6-6-6"></path>
-                            </svg>
-                        </button>
-                    </nav>
                 </div>
             </div>
         </div>
