@@ -270,7 +270,7 @@ function vendorCount(s: Solution): string {
                                      stroke-linecap="round" stroke-linejoin="round" v-html="typeIcon(s)"></svg>
                             </div>
                             <div class="rmc-body">
-                                <h3><a class="rmc-stretch" href="#">{{ s.name }}</a></h3>
+                                <h3><NuxtLink class="rmc-stretch" :to="`/catalog/${s.id}`">{{ s.name }}</NuxtLink></h3>
                                 <p class="rmc-maker">{{ maker(s) }}</p>
                                 <p class="rmc-desc">{{ s.purpose || s.description || 'Назначение не указано' }}</p>
                                 <div class="rmc-tags">
@@ -487,6 +487,24 @@ function vendorCount(s: Solution): string {
                     }
                 
 /* Добавлено к исходной вёрстке страницы. */
+/* Карточка целиком ведёт в карточку решения. position:relative нужен,
+чтобы ::after-перекрытие легло поверх содержимого, а не под ним. */
+.rmc-card {
+  position: relative;
+}
+
+.rmc-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.rmc-card .rmc-stretch {
+  position: relative;
+  z-index: 1;
+}
+
 .rmc-visual--photo img {
   width: 100%;
   height: 100%;

@@ -1,5 +1,14 @@
 <script setup lang="ts">
     const headerMobileMenuStore = useHeaderMobileMenuStore()
+    const auth = useAuthStore()
+    const router = useRouter()
+
+    // Раньше в шапке всегда стояли «Войти» и «Зарегистрироваться», даже когда
+    // пользователь уже вошёл: состояние авторизации она не читала.
+    async function signOut() {
+        auth.logout()
+        await router.push('/')
+    }
 </script>
 
 <template>    
@@ -31,13 +40,22 @@
 
                 <div class="hidden sm:flex items-center gap-2">
                     
-                    <NuxtLink
-                        style="height:36px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;border:1px solid rgba(30,136,255,0.4);color:var(--accent);background:transparent;font-size:13px;font-weight:500;transition:background 0.15s"
-                        to="/login">Войти</NuxtLink>
-                        
+<template v-if="auth.isAuthenticated">
+                        <span class="lb-user" :title="auth.user?.email ?? ''">{{ auth.user?.full_name || auth.user?.email }}</span>
+                        <button type="button"
+                                style="height:36px;padding:0 14px;border-radius:8px;border:1px solid rgba(30,136,255,0.4);background:transparent;color:var(--accent);font-size:13px;cursor:pointer"
+                                @click="signOut">Выйти</button>
+                    </template>
+
+                    <template v-else>
                         <NuxtLink
-                        style="height:36px;padding:0 16px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;background:var(--accent);color:#FFFFFF;font-size:13px;font-weight:600;white-space:nowrap;transition:background 0.15s"
-                        to="/register">Зарегистрироваться</NuxtLink></div>
+                            style="height:36px;padding:0 14px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;border:1px solid rgba(30,136,255,0.4);color:var(--accent);background:transparent;font-size:13px;font-weight:500;transition:background 0.15s"
+                            to="/login">Войти</NuxtLink>
+
+                        <NuxtLink
+                            style="height:36px;padding:0 16px;border-radius:8px;display:inline-flex;align-items:center;text-decoration:none;background:var(--accent);color:#FFFFFF;font-size:13px;font-weight:600;white-space:nowrap;transition:background 0.15s"
+                            to="/register">Зарегистрироваться</NuxtLink>
+                    </template></div>
                 
                 <button v-if="!headerMobileMenuStore.open" @click="headerMobileMenuStore.onOpen" class="lg:hidden lb-iconbtn" aria-label="Меню">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"

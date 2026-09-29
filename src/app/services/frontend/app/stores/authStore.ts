@@ -84,6 +84,7 @@ export const useAuthStore = defineStore('authStore', {
     async fetchMe () {
       const { $fetchApi } = useNuxtApp()
       this.user = await $fetchApi('/api/v1/auth/me')
+      this.token = useCookie('access_token').value ?? ''
     },
 
     logout () {
