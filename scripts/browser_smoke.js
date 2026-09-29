@@ -19,6 +19,8 @@
  * а не в каталог фронтенда.
  *
  * Аргументы: адрес API и адрес фронтенда. Второй можно не указывать.
+ * Скрипт работает и против продакшена: позиции для проверки ищутся в
+ * каталоге по названию, а не прописаны в коде — UUID у каждой базы свои.
  * Используется 127.0.0.1, а не localhost: в некоторых окружениях localhost
  * резолвится в IPv6, и опубликованные порты начинают отвечать с задержкой.
  */
@@ -29,13 +31,6 @@ const API = process.argv[2] || 'http://127.0.0.1:5000'
 const BASE = process.argv[3] || 'http://127.0.0.1:8080'
 const SHOT = process.env.SHOT_DIR || '/tmp/browser-smoke'
 
-// Позиции подобраны по данным: фото есть не у всех (112 из 190), а ТТХ
-// заполнены у единиц. Иначе проверка зависела бы от того, какая позиция
-// попадётся первой.
-const RICH = '8c467586-9bb0-4be6-ac0b-e2ef71b0a75c' // Ronavi H1500: фото, ТТХ, комплектация
-const SPARSE = '8f6e8f9c-886c-41d8-a5c7-61b49a520598' // 85ТК: фото есть, ТТХ нет
-const NO_PHOTO = '3ae303da-e463-4356-ab7a-da9edec07c7d' // DMR Carrier P: фото нет, ТТХ есть
-
 let fails = 0
 const say = (ok, name, extra = '') => {
   if (!ok) fails++
@@ -44,6 +39,31 @@ const say = (ok, name, extra = '') => {
 
 ;(async () => {
   require('fs').mkdirSync(SHOT, { recursive: true })
+
+  // Три позиции с разным наполнением. Ищем их в каталоге по названию:
+  // фото есть не у всех позиций, а ТТХ заполнены у единиц, и без явного
+  // выбора проверка зависела бы от того, какая позиция попадётся первой.
+  const listing = await fetch(`${API}/api/v1/catalog?limit=500`).then((r) => r.json())
+  const items = listing.items || []
+  const pick = (test) => items.find(test)
+  const RICH = pick((i) => i.photo_url && (i.completeness || 0) >= 60 && i.name.startsWith('Ronavi'))
+  const SPARSE = pick((i) => i.photo_url && (i.completeness || 0) < 30)
+  const NO_PHOTO = pick((i) => !i.photo_url && (i.completeness || 0) >= 60)
+  for (const [label, it] of [
+    ['с фото и ТТХ', RICH],
+    ['без ТТХ', SPARSE],
+    ['без фото', NO_PHOTO],
+  ]) {
+    if (!it) {
+      say(false, `в каталоге нет позиции «${label}» — проверка неполная`)
+      process.exit(1)
+    }
+  }
+  console.log(
+    `позиции: ${RICH.name} / ${SPARSE.name} / ${NO_PHOTO.name}\n` +
+      `API: ${API}\nфронтенд: ${BASE}\n`,
+  )
+
   const browser = await firefox.launch({ headless: true })
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } })
 
@@ -96,10 +116,11 @@ const say = (ok, name, extra = '') => {
   say(!loading, 'полоса загрузки погасла')
 
   console.log('3. КАРТОЧКА С ТТХ')
-  await page.goto(`${BASE}/catalog/${RICH}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  await page.goto(`${BASE}/catalog/${RICH.id}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
   await page.locator('.rpd-title h1').waitFor({ timeout: 30000 }).catch(() => {})
   await page.waitForTimeout(2000)
-  say(/Ronavi/i.test(await page.locator('.rpd-title h1').innerText().catch(() => '')), 'название')
+  const title = await page.locator('.rpd-title h1').innerText().catch(() => '')
+  say(title.trim() === RICH.name, `название: ${title.trim() || '—'}`, `ожидали ${RICH.name}`)
   const specs = await page.locator('.rpd-spec').count()
   say(specs > 0, `строк ТТХ и цены: ${specs}`, 'блок не отрисовался')
   const price = await page.locator('.rpd-price__main').innerText().catch(() => '')
@@ -110,7 +131,16 @@ const say = (ok, name, extra = '') => {
     .catch(() => false)
   say(imgOk, 'фото загрузилось')
   const varRows = await page.locator('.rpd-variant').count()
-  say(varRows > 0, `комплектаций показано: ${varRows}`, 'блок комплектаций пуст')
+  // Комплектации есть не у каждой позиции, поэтому сверяем с тем, что
+  // отдал API: блок обязан совпасть, а не просто «что-то нарисовалось».
+  const expectVariants = await fetch(`${API}/api/v1/catalog/${RICH.id}`)
+    .then((r) => r.json())
+    .then((d) => (d.variants || []).length)
+  say(
+    varRows === expectVariants,
+    `комплектаций: ${varRows} (в данных ${expectVariants})`,
+    'не совпало с данными',
+  )
   // applicable_object_types хранит коды (warehouse, airport) — на карточке
   // должны быть названия из справочника.
   const conditions = await page.locator('.rpd-block p').allInnerTexts().catch(() => [])
@@ -124,18 +154,24 @@ const say = (ok, name, extra = '') => {
   await page.screenshot({ path: `${SHOT}/02-solution.png`, fullPage: true })
 
   console.log('4. КАРТОЧКА БЕЗ ТТХ')
-  await page.goto(`${BASE}/catalog/${SPARSE}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  await page.goto(`${BASE}/catalog/${SPARSE.id}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
   await page.locator('.rpd-title h1').waitFor({ timeout: 30000 }).catch(() => {})
   await page.waitForTimeout(1500)
-  say((await page.locator('.rpd-title h1').count()) > 0, 'карточка открылась')
+  say(
+    (await page.locator('.rpd-title h1').innerText().catch(() => '')).trim() === SPARSE.name,
+    `карточка открылась: ${SPARSE.name}`,
+  )
   say(
     (await page.locator('.rpd-price__main').innerText().catch(() => '')).length > 0,
     'цена показана',
   )
-  console.log(`  инфо  строк ТТХ: ${await page.locator('.rpd-spec').count()} (у позиции их нет)`)
+  const sparseSpecs = await page.locator('.rpd-spec').count()
+  // Блок ТТХ у такой позиции скрыт законно, но у неё остаётся цена —
+  // проверяем, что страница не схлопнулась целиком.
+  say(sparseSpecs === 0, `блок ТТХ скрыт (строк: ${sparseSpecs})`, 'показан при заполненности 0%')
 
   console.log('5. ПОЗИЦИЯ БЕЗ ФОТО')
-  await page.goto(`${BASE}/catalog/${NO_PHOTO}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
+  await page.goto(`${BASE}/catalog/${NO_PHOTO.id}`, { waitUntil: 'domcontentloaded', timeout: 90000 })
   await page.locator('.rpd-title h1').waitFor({ timeout: 30000 }).catch(() => {})
   await page.waitForTimeout(1500)
   say((await page.locator('.rpd-visual--none').count()) > 0, 'показана заглушка «Нет фото»')
@@ -149,7 +185,7 @@ const say = (ok, name, extra = '') => {
   }
 
   await browser.close()
-  console.log(`API: ${API}\nфронтенд: ${BASE}\nснимки: ${SHOT}`)
+  console.log(`снимки: ${SHOT}`)
   console.log(fails ? `\nПРОВАЛЕНО ПРОВЕРОК: ${fails}` : '\nвсе проверки пройдены')
   process.exit(fails ? 1 : 0)
 })().catch((e) => {
