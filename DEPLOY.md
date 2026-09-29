@@ -164,7 +164,31 @@ Running upgrade  -> 33f3b72b2055, initial schema     ← миграции про
 | `api` → Start Command | `uvicorn app.main:app --host 0.0.0.0 --port $PORT` |
 | `api` → Environment | `DATABASE_URL`, `SECRET_KEY`, `FRONTEND_ORIGINS` |
 | статика → Environment | `NUXT_PUBLIC_API_BASE=https://<slug-бэкенда>.onrender.com` |
+| статика → Redirects & Rewrites | rewrite `/*` → `/200.html` (см. ниже) |
 | все три → репозиторий | GitHub, ветка `main` |
+
+#### Почему статике нужна перезапись
+
+Nuxt собирает SPA и кладёт оболочку в `200.html`. Render раздаёт файлы
+как есть и на любой путь, для которого на диске нет файла, отвечает 404.
+Без правила перезаписи карточка решения (`/catalog/<id>`) открывается
+локально, а на хостинге даёт 404 — причём статус 200 у `/catalog`
+при этом есть, и кажется, что всё работает.
+
+Правило описано в [`render.yaml`](./render.yaml) (`routes`), и Blueprint
+применит его сам. Сервис, созданный вручную, нужно настроить вручную:
+**Dashboard → Static Site → Redirects/Rewrites → Add**
+
+- Type: `Rewrite`
+- Source: `/*`
+- Destination: `/200.html`
+
+Проверить после настройки:
+
+```bash
+curl -o /dev/null -w '%{http_code}\n' https://<фронтенд>/catalog/любой-uuid
+# должно быть 200, а не 404
+```
 
 Про образ Python: `ARG PYTHON_IMAGE` в [Dockerfile](./Dockerfile) переопределяется
 через **Build Arguments** (Render → Environment → Build Arguments), а не через

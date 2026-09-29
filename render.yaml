@@ -53,7 +53,14 @@ services:
     buildCommand: cd src/app/services/frontend && npm ci && npm run generate
     # Nuxt 4 (ssr: false) собирает статику в .output/public, а не в dist.
     staticPublishPath: src/app/services/frontend/.output/public
-    # Nuxt 4 (ssr: false) собирает статику в .output/public, а не в dist.
+    # Nuxt собирает SPA и кладёт оболочку в 200.html. Без этого правила
+    # Render отдаёт 404 на любой путь, для которого нет файла на диске, —
+    # то есть и на /catalog/<id>, и на /cases: такие страницы открывались бы
+    # только локально, а на хостинге вели бы в 404.
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /200.html
     envVars:
       # Фронтенд должен знать адрес бэкенда. Nuxt читает переменные окружения
       # только для ключей, объявленных в runtimeConfig (см. nuxt.config.ts).
