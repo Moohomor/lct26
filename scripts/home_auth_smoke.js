@@ -211,7 +211,52 @@ const say = (ok, name, extra = '') => {
     )
   }
 
-  console.log('5. ОШИБКИ В КОНСОЛИ')
+  console.log('5. ОШИБКИ ПОКАЗАНЫ ПОЛЬЗОВАТЕЛЮ')
+  // Путь с ошибкой — тот, что не покрывали: формы отправляли корректные
+  // значения и проходили, а при отказе бэкенда на экран выводилась пустая
+  // строка. Ошибки приходят статусом 422 и 401, а текст терялся по дороге.
+  await go('/register', 'input[type="email"]')
+  const badEmail = `badpass${Date.now().toString(36)}@example.com`
+  await page.locator('input[autocomplete="given-name"]').fill('Проверка')
+  await page.locator('input[type="email"]').fill(badEmail)
+  // Пароль только из букв: бэкенд отвечает 422
+  await page.locator('input[autocomplete="new-password"]').first().fill('abcdefgh')
+  await page.locator('input[autocomplete="new-password"]').nth(1).fill('abcdefgh')
+  await page.locator('button[role="checkbox"]').click()
+  await page.locator('button[type="submit"]').click()
+  // В этом окружении запрос к API идёт десятки секунд, поэтому ждём
+  // фиксированную паузу и читаем текст, а не полагаемся на появление
+  // элемента: он подставляется в том же тике, что и ответ.
+  await page.waitForTimeout(25000)
+  const regErrors = await page.locator('.rg-error').allInnerTexts().catch(() => [])
+  const regError = (regErrors[0] || '').trim()
+  say(
+    /только из букв/.test(regError),
+    `ошибка регистрации показана: «${regError.slice(0, 60)}»`,
+    regError || 'текст не появился',
+  )
+  say(
+    !/Value error|password/i.test(regError),
+    'в тексте нет служебных слов pydantic и английского имени поля',
+    regError.slice(0, 70),
+  )
+
+  await go('/login', 'input[type="email"]')
+  await page.locator('input[type="email"]').fill('user@example.com')
+  await page.locator('input[type="password"]').fill('неправильный')
+  await page.locator('button[type="submit"]').click()
+  await page.waitForTimeout(25000)
+  const loginText = await page
+    .locator('form')
+    .innerText()
+    .catch(() => '')
+  say(
+    /неверная почта или пароль/i.test(loginText),
+    `ошибка входа показана`,
+    loginText.slice(0, 70) || 'текст не появился',
+  )
+
+  console.log('6. ОШИБКИ В КОНСОЛИ')
   // Холодная загрузка в dev-сервере трансформирует чанки и иллюстрации по
   // требованию, и при медленной сети запрос успевает оборваться: страница
   // при этом полностью отрисовывается (проверено выше), но в консоль падает

@@ -66,15 +66,84 @@ def register_exception_handlers(app: FastAPI) -> None:
         errors = _jsonable_errors(exc.errors())
         first = errors[0] if errors else {}
         loc = ".".join(str(p) for p in first.get("loc", [])[1:]) or "тело запроса"
+        label = FIELD_LABELS.get(loc, loc)
+        # Собственный текст валидатора лежит в ctx.error: он написан по-русски
+        # и уже объясняет проблему. msg для таких ошибок выглядит как
+        # «Value error, пароль не должен состоять только из букв» — с
+        # английским префиксом и без указания поля. Поэтому берём ctx.error,
+        # а если он есть — не добавляем свою обвязку про «проверьте поле».
+        own = first.get("ctx", {}).get("error")
+        if own:
+            message = own
+            hint = "Исправьте значение и отправьте форму ещё раз."
+        else:
+            message = f"Проверьте значение поля «{label}»: {_readable_msg(first)}"
+            hint = "Сверьтесь с единицами измерения и допустимым диапазоном поля."
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=_payload(
                 "validation_error",
-                f"Проверьте значение поля «{loc}»: {first.get('msg', 'некорректное значение')}",
-                hint="Сверьтесь с единицами измерения и допустимым диапазоном поля.",
+                message,
+                hint=hint,
                 details=errors,
             ),
         )
+
+
+def _clean_msg(msg: str) -> str:
+    """Убирает служебные префиксы pydantic из текста ошибки."""
+    text = (msg or "").strip()
+    for prefix in ("Value error, ", "Assertion failed, "):
+        if text.startswith(prefix):
+            text = text[len(prefix):]
+    return text or "некорректное значение"
+
+
+#: Ограничения pydantic приходят по-английски («String should have at least
+#: 8 characters»). Пользователю нужна причина на русском.
+MSG_TYPES = {
+    "string_too_short": "значение короче допустимого",
+    "string_too_long": "значение длиннее допустимого",
+    "missing": "обязательное поле не заполнено",
+    "string_type": "ожидается текст",
+    "int_type": "ожидается целое число",
+    "float_type": "ожидается число",
+    "bool_type": "ожидается «да» или «нет»",
+    "list_type": "ожидается список",
+    "dict_type": "ожидается объект",
+    "value_error": "значение не прошло проверку",
+    "greater_than_equal": "значение меньше допустимого",
+    "less_than_equal": "значение больше допустимого",
+    "too_short": "значение короче допустимого",
+    "too_long": "значение длиннее допустимого",
+}
+
+
+def _readable_msg(first: dict) -> str:
+    """Текст ошибки для случая, когда своего русского сообщения нет."""
+    kind = first.get("type", "")
+    if kind in MSG_TYPES:
+        return MSG_TYPES[kind]
+    return _clean_msg(str(first.get("msg", "")))
+
+
+#: Названия полей в ответе. В форме их подписывают по-русски, и без
+#: подстановки пользователь видел «поле «password»» вместо «пароль».
+FIELD_LABELS = {
+    "email": "почта",
+    "password": "пароль",
+    "full_name": "имя и фамилия",
+    "organization": "организация",
+    "phone": "телефон",
+    "name": "название",
+    "search": "поисковый запрос",
+    "object_type": "тип объекта",
+    "parameters": "параметры объекта",
+    "process_codes": "процессы",
+    "quantity": "количество",
+    "items": "состав оборудования",
+    "horizon_years": "срок расчёта",
+}
 
 
 def _jsonable_errors(errors: list[dict]) -> list[dict]:

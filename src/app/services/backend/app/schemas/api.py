@@ -33,8 +33,36 @@ def _check_email(value: str) -> str:
             value, check_deliverability=False, globally_deliverable=False
         )
     except EmailNotValidError as exc:
-        raise ValueError(str(exc)) from exc
+        # Библиотека объясняет проблему по-английски, а сообщение видят
+        # пользователи. У синтаксических ошибок (EmailSyntaxError) поля
+        # reason нет, поэтому переводим по самому тексту.
+        text = str(exc)
+        raise ValueError(EMAIL_ERRORS.get(text, "Почта указана неверно")) from exc
     return value
+
+
+#: Тексты отказа email_validator → русский.
+EMAIL_ERRORS = {
+    "An email address must have an @-sign.": "В почте должен быть знак @",
+    "The part after the @-sign contains invalid characters: '@'.":
+        "В почте указан недопустимый символ",
+    "The part after the @-sign contains invalid characters: '.'.":
+        "Домен в почте указан неверно",
+    "The part after the @-sign contains a dot but no domain.":
+        "В почте не указан домен",
+    "The part after the @-sign contains invalid characters.":
+        "Домен в почте указан неверно",
+    "There must be something after the @-sign.": "В почте не указан домен",
+    "The local part of the email address contains invalid characters.":
+        "Имя пользователя в почте указано неверно",
+    "The local part of the email address is missing.":
+        "В почте не указано имя пользователя",
+    "The local part of the email address contains a forbidden character.":
+        "Имя пользователя в почте указано неверно",
+    "The email address is too long": "Почта слишком длинная",
+    "The email address contains non-ASCII characters.":
+        "В почте недопустимы символы, отличные от латинских",
+}
 
 
 #: Адрес электронной почты: синтаксис проверен, реальный домен — нет.
