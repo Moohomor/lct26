@@ -17,6 +17,7 @@ from typing import Any
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.api.v1.router import api_router
 from app.core.config import settings
@@ -146,6 +147,15 @@ app.add_middleware(
 
 register_exception_handlers(app)
 app.include_router(api_router, prefix="/api/v1")
+
+# Фотографии решений из «Каталога внедрения» ФЦ БАС раздаются как статика.
+# Монтируется только каталог solutions: шрифты для PDF лежат рядом, но
+# отдавать их наружу незачем.
+app.mount(
+    "/static",
+    StaticFiles(directory=settings.assets_dir / "solutions"),
+    name="static",
+)
 
 
 @app.middleware("http")

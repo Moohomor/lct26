@@ -8,6 +8,17 @@ useHead({
 // с выдуманными числами — он ничего не говорил о том, что есть на самом деле.
 const { $fetchApi } = useNuxtApp()
 
+// photo_url приходит от API относительным путём («/static/...»), поэтому
+// к нему нужен адрес бэкенда: наRender фронтенд и API — разные домены.
+const apiBase = useRuntimeConfig().public.apiBase.replace(/\/$/, '')
+
+function photo(s: Solution): string | null {
+  if (!s.photo_url) return null
+  return s.photo_url.startsWith('http')
+    ? s.photo_url
+    : `${apiBase}${s.photo_url}`
+}
+
 type Vendor = { id: number; name: string; country?: string | null }
 type SolutionType = { id: number; code: string; name: string }
 type Solution = {
@@ -25,6 +36,7 @@ type Solution = {
   price_source: string | null
   completeness: number
   is_verified: boolean
+  photo_url: string | null
 }
 
 const PAGE_SIZE = 60
@@ -136,6 +148,15 @@ const TYPE_ICONS: Record<string, string> = {
   other: '<rect x="3" y="8" width="8" height="8" rx="1"/><rect x="13" y="8" width="8" height="8" rx="1"/><path d="M7 4v4M17 4v4"/>',
 }
 
+// Ссылка на снимок может не загрузиться: тогда показываем значок типа,
+// а не пустое место.
+function onPhotoError(event: Event) {
+  const el = event.target as HTMLElement | null
+  const host = el?.parentElement
+  if (el) el.style.display = 'none'
+  if (host) host.classList.remove('rmc-visual--photo')
+}
+
 function typeIcon(s: Solution): string {
   return TYPE_ICONS[s.solution_type?.code ?? 'other'] ?? TYPE_ICONS.other
 }
@@ -239,7 +260,11 @@ function vendorCount(s: Solution): string {
                             <span class="rmc-badge" v-if="s.status !== 'operation'">{{
                                 STATUS_LABEL[s.status] ?? s.status
                             }}</span>
-                            <div class="rmc-visual rmc-visual--icon" role="img"
+                            <div class="rmc-visual rmc-visual--photo" v-if="photo(s)">
+                                <img :src="photo(s)!" :alt="s.name" loading="lazy" decoding="async"
+                                     @error="onPhotoError($event)">
+                            </div>
+                            <div class="rmc-visual rmc-visual--icon" v-else role="img"
                                  :aria-label="s.solution_type?.name ?? 'Решение'">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
                                      stroke-linecap="round" stroke-linejoin="round" v-html="typeIcon(s)"></svg>
@@ -462,6 +487,13 @@ function vendorCount(s: Solution): string {
                     }
                 
 /* Добавлено к исходной вёрстке страницы. */
+.rmc-visual--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+}
+
 .rmc-visual--icon {
   display: grid;
   place-items: center;

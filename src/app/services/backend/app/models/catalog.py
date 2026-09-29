@@ -176,6 +176,10 @@ class Solution(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     medical_sanitation_ready: Mapped[bool | None] = mapped_column(Boolean)
 
     # ── Качество и происхождение данных (ТЗ 3.3.4) ───────────────────────
+    # Фотография позиции: путь относительно app/assets. Заполняется из
+    # solution_photos.json, который собирается из «Каталога внедрения»
+    # ФЦ БАС. Не у всех позиций снимок есть — это нормально.
+    photo_file: Mapped[str | None] = mapped_column(String(160), index=True)
     data_source_id: Mapped[int | None] = mapped_column(
         ForeignKey("data_sources.id", ondelete="SET NULL")
     )

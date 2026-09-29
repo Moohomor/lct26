@@ -6,6 +6,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Query
@@ -392,6 +394,10 @@ def serialize_solution(s: Solution, *, detail: bool = False) -> dict[str, Any]:
             if s.solution_type
             else None
         ),
+        # photo_file хранится относительно app/assets ("solutions/x.jpg"),
+        # а статика смонтирована на каталог solutions — в URL попадает
+        # только имя файла.
+        "photo_url": f"/static/{Path(s.photo_file).name}" if s.photo_file else None,
         "status": s.status,
         "trl": s.trl,
         "purpose": s.purpose,

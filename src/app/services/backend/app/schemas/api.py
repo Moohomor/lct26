@@ -220,6 +220,8 @@ class SolutionOut(ApiModel):
     variant_label: str | None
     data_source: DataSourceOut | None
     specs_updated_at: str | None
+    #: Снимок из «Каталога внедрения» ФЦ БАС. Не у всех позиций он есть.
+    photo_url: str | None = None
 
 
 class SolutionDetail(SolutionOut):

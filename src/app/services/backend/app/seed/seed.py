@@ -38,6 +38,7 @@ from app.services.importers.catalog_csv import import_catalog
 from app.services.importers.catalog_taxonomy import PROCESSES
 from app.services.importers.object_params import import_object_parameters
 from app.services.importers.reference_solutions import import_reference_solutions
+from app.services.importers.solution_photos import import_solution_photos
 
 logger = logging.getLogger(__name__)
 
@@ -275,6 +276,17 @@ def run_seed(db: Session, *, force: bool = False) -> SeedReport:
     report.solution_types = db.scalar(select(func.count()).select_from(SolutionType)) or 0
     report.batches.append({"kind": "reference_solutions", **ref_result.as_dict()})
     report.warnings.extend(ref_result.warnings)
+
+    # 5a. Фотографии решений из «Каталога внедрения» ФЦ БАС. Импорт идёт
+    # после каталога и эталонных решений: привязка идёт по названию позиции.
+    photo_result = import_solution_photos(db)
+    report.batches.append({"kind": "solution_photos", **photo_result.as_dict()})
+    report.warnings.extend(
+        f"Фото: нет файла {p}" for p in photo_result.files_missing
+    )
+    report.warnings.extend(
+        f"Фото: нет позиции каталога «{n}»" for n in photo_result.names_missing
+    )
 
     # 6. Версия каталога и журнал импорта.
     for batch_payload in report.batches:
