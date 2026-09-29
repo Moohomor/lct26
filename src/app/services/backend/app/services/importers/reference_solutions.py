@@ -144,6 +144,8 @@ def import_reference_solutions(db: Session) -> ReferenceImportResult:
         solution.vendor_id = vendor.id
         solution.solution_type_id = solution_type.id
         solution.name = ref.name
+        if ref.industry:
+            solution.industry = ref.industry
         solution.applicable_object_types = list(ref.object_types)
         solution.process_codes = list(ref.process_codes)
         solution.data_source_id = source.id

@@ -29,6 +29,9 @@ class ReferenceSolution:
     specs: dict[str, object]
     source_name: str
     source_url: str
+    #: Отрасль из «Каталога внедрения» ФЦ БАС. Без неё решение не попадает
+    #: ни под один фильтр каталога по отрасли и пропадает из вида.
+    industry: str | None = None
     #: подстрока названия в каталоге организатора для забора цены и статуса
     catalog_match: str | None = None
     note: str | None = None
@@ -51,6 +54,7 @@ def _passage(width_mm: float, margin_mm: float = 300) -> Decimal:
 
 WAREHOUSE_AMR = ReferenceSolution(
     slug="ronavi-h1500",
+    industry="Торговля и услуги",
     name="Ronavi H1500",
     vendor="ООО «Ронави Роботикс»",
     solution_type="amr",
@@ -82,6 +86,7 @@ WAREHOUSE_AMR = ReferenceSolution(
 
 WAREHOUSE_FMR = ReferenceSolution(
     slug="dmr-carrier-p",
+    industry="Торговля и услуги",
     name="DMR Carrier P",
     vendor="ООО «Диком-Сервис»",
     solution_type="fmr",
@@ -113,6 +118,7 @@ WAREHOUSE_FMR = ReferenceSolution(
 
 CLEANER_MARK2 = ReferenceSolution(
     slug="mark-2-se",
+    industry="Торговля и услуги",
     name="MARK 2 SE",
     vendor="ООО «Р2Б»",
     solution_type="cleaner",
@@ -142,6 +148,7 @@ CLEANER_MARK2 = ReferenceSolution(
 
 SHUTTLE_STELCON = ReferenceSolution(
     slug="stelcon-pallet-shuttle",
+    industry="Торговля и услуги",
     name="Pallet Shuttle",
     vendor="Stelcon",
     solution_type="shuttle",
@@ -170,6 +177,7 @@ SHUTTLE_STELCON = ReferenceSolution(
 
 TUGGER_COGNITIVE = ReferenceSolution(
     slug="cognitive-pilot-tugger",
+    industry="Транспорт и логистика",
     name="Cognitive Pilot (беспилотный тягач)",
     vendor="Cognitive Pilot",
     solution_type="tugger",
@@ -202,6 +210,7 @@ TUGGER_COGNITIVE = ReferenceSolution(
 
 TRUCK_EVOCARGO = ReferenceSolution(
     slug="evocargo-n1",
+    industry="Транспорт и логистика",
     name="EVOCARGO N1",
     vendor="ООО «Эвокарго»",
     solution_type="autonomous_truck",
@@ -232,6 +241,7 @@ TRUCK_EVOCARGO = ReferenceSolution(
 
 MEDICAL_AMR_RONAVI_SD = ReferenceSolution(
     slug="ronavi-sd",
+    industry="Транспорт и логистика",
     name="Ronavi SD",
     vendor="ООО «Ронави Роботикс»",
     solution_type="amr",
@@ -260,6 +270,7 @@ MEDICAL_AMR_RONAVI_SD = ReferenceSolution(
 
 MEDICAL_DELIVERY_PUDU = ReferenceSolution(
     slug="pudubot-2",
+    industry="Транспорт и логистика",
     name="PuduBot 2",
     vendor="Pudu Robotics",
     solution_type="delivery_robot",

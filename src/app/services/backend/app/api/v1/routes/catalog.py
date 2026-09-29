@@ -43,6 +43,9 @@ def list_solutions(
     object_type: str | None = Query(default=None, description="Код типа объекта"),
     process_code: list[str] | None = Query(default=None),
     solution_type: list[str] | None = Query(default=None, description="Коды типов решений"),
+    industry: list[str] | None = Query(
+        default=None, description="Отрасли применения (точное совпадение)"
+    ),
     vendor_id: list[int] | None = Query(default=None),
     status: list[str] | None = Query(default=None),
     price_source: str | None = Query(default=None),
@@ -108,6 +111,10 @@ def list_solutions(
                 select(SolutionType.id).where(SolutionType.code.in_(solution_type))
             )
         )
+    if industry:
+        # Отрасли в каталоге заведены из «Каталога внедрения» ФЦ БАС, где
+        # они названы ровно так же, поэтому сравнение точное, а не по LIKE.
+        filters.append(Solution.industry.in_(industry))
     if vendor_id:
         filters.append(Solution.vendor_id.in_(vendor_id))
     if status:
@@ -242,6 +249,65 @@ def catalog_stats(db: DbSession) -> dict[str, Any]:
             ).all()
         ],
         "price_coverage_pct": round(priced / total * 100, 1) if total else 0.0,
+    }
+
+
+@router.get("/facets")
+def catalog_facets(db: DbSession) -> dict[str, Any]:
+    """Значения для панели фильтров: отрасли, типы решений, статусы.
+
+    Отдельный эндпоинт, а не захардкоженный список на фронтенде: при смене
+    организатором отраслей или добавлении нового типа решения фильтр обязан
+    показать новое значение сам. Иначе позиция попадает в каталог и становится
+    недоступной по любому фильтру — молча.
+
+    Считается то же множество, что показывает список по умолчанию, — без
+    комплектаций (`is_variant_of_id is None`). Иначе счётчик в скобках
+    обещал бы 28 позиций, а по клику открывалось бы 22.
+    """
+    base = Solution.is_variant_of_id.is_(None)
+    industries = [
+        {"value": name, "count": count}
+        for name, count in db.execute(
+            select(Solution.industry, func.count())
+            .where(Solution.industry.isnot(None), base)
+            .group_by(Solution.industry)
+            .order_by(func.count().desc())
+        ).all()
+    ]
+    types = [
+        {"value": st.code, "label": st.name, "count": count}
+        for st, count in db.execute(
+            select(SolutionType, func.count())
+            .join(Solution, Solution.solution_type_id == SolutionType.id)
+            .where(base)
+            .group_by(SolutionType.id)
+            .order_by(func.count().desc())
+        ).all()
+    ]
+    statuses = [
+        {"value": status, "count": count}
+        for status, count in db.execute(
+            select(Solution.status, func.count())
+            .where(base)
+            .group_by(Solution.status)
+            .order_by(func.count().desc())
+        ).all()
+    ]
+    without_industry = (
+        db.scalar(
+            select(func.count())
+            .select_from(Solution)
+            .where(Solution.industry.is_(None), base)
+        )
+        or 0
+    )
+    return {
+        "industries": industries,
+        "solution_types": types,
+        "statuses": statuses,
+        # Решения без отрасли иначе не попадают ни под один фильтр «отрасль».
+        "without_industry": without_industry,
     }
 
 
