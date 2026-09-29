@@ -503,8 +503,12 @@ def run_seed(
     уметь восстановить себя сам.
     """
     from app.seed.seed import run_seed as _run
+    from app.seed.seed import seed_summary
 
     started = time.perf_counter()
+    # run_seed возвращает dataclass SeedReport, у которого нет метода get():
+    # обращение result.get(...) роняло ручку в 500. Сводку для ответа берём
+    # из seed_summary() — она читает те же таблицы уже после коммита.
     result = _run(db, force=force)
     _audit(db, user, "seed", "database", None, after={"force": force})
     db.commit()
@@ -512,8 +516,8 @@ def run_seed(
         ok=True,
         forced=force,
         duration_ms=int((time.perf_counter() - started) * 1000),
-        summary=result.get("summary", result),
-        warnings=result.get("warnings", []),
+        summary=seed_summary(db),
+        warnings=list(result.warnings),
     )
 
 
